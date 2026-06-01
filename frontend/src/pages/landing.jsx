@@ -2,14 +2,9 @@ import React, { useState } from 'react';
 
 export default function Landing() {
   // Mini Interactive Widget States
-  const [tasks, setTasks] = useState([
-    { id: 1, text: 'Carve out Study Plan for Biology', completed: false, category: 'study' },
-    { id: 2, text: 'Draft 5 paper trial quizzes in Math', completed: true, category: 'quiz' },
-    { id: 3, text: 'Plan afternoon focus hour on Physics', completed: false, category: 'timetable' },
-    { id: 4, text: 'Review revision keywords', completed: false, category: 'revision' }
-  ]);
+  const [tasks, setTasks] = useState([]);
   const [inputText, setInputText] = useState('');
-  const [noteContent, setNoteContent] = useState('Keep it slow. Focus is a seedling that needs watering everyday. 🌸');
+  const [noteContent, setNoteContent] = useState('Start with one clear task and build from there.');
   const [noteType, setNoteType] = useState('yellow'); // yellow, pink, green
 
   // Active Desk Elements (for hover/click states)
@@ -84,7 +79,7 @@ export default function Landing() {
           </h1>
 
           <p className="hero-subtitle">
-            Say goodbye to cold, robotic, notification-heavy dashboards. <strong>woodyy</strong> is a mindful digital study cabinet crafted with warm wood rings, hand-drawn planners, tactile quizzes, and revision branches designed to make focus feel organic and calming.
+            Say goodbye to cold, robotic, notification-heavy dashboards. <strong>Mansi</strong> is a mindful digital study cabinet crafted with warm wood rings, hand-drawn planners, tactile quizzes, and revision branches designed to make focus feel organic and calming.
           </p>
 
           <div className="hero-actions">
@@ -103,8 +98,8 @@ export default function Landing() {
                 carve your path!
               </span>
             </div>
-            <a href="#demo" className="btn-sketch sketch-border sketch-shadow hero-sub-btn">
-              <span>Try Interactive Desk</span>
+            <a href="#how-it-works" className="btn-sketch sketch-border sketch-shadow hero-sub-btn">
+              <span>See How It Works</span>
             </a>
           </div>
         </div>
@@ -265,7 +260,7 @@ export default function Landing() {
             <div className="desk-notebook sketch-border-sm">
               <div className="notebook-binder"></div>
               <div className="notebook-page-left">
-                <h4 className="notebook-h4">Woodyy Desk</h4>
+                <h4 className="notebook-h4">Mansi Desk</h4>
                 <p className="notebook-p">Interactive study objects react to your focus routine.</p>
                 <div className="paper-doodle">
                   <svg width="70" height="20" viewBox="0 0 70 20" fill="none">
@@ -301,7 +296,7 @@ export default function Landing() {
 
         <div className="features-grid">
           {/* Feature 1: Study Plan */}
-          <div className="feature-card sketch-border sketch-shadow">
+          <div className="feature-card sketch-border sketch-shadow" id="study-plan">
             <div className="feature-icon-wrapper bg-yellow">
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
@@ -365,15 +360,15 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 4. TACTILE INTERACTIVE WORKSPACE WIDGET DEMO */}
+      {/* 4. TACTILE INTERACTIVE WORKSPACE WORKFLOW */}
       <section className="demo-section" id="how-it-works">
         <div className="demo-outer sketch-border sketch-shadow">
           <div className="demo-grid-split">
             {/* Left Column: Interactive Checkbox List & Plant Grow Demo */}
             <div className="demo-list-col">
               <div className="post-it-title-wrapper">
-                <h3 className="demo-section-h3">Try the Interactive Desk Planner</h3>
-                <p className="text-sm">Check off items to grow the wooden seedling and progress bar above!</p>
+                <h3 className="demo-section-h3">Build Your Interactive Desk Planner</h3>
+                <p className="text-sm">Add items to grow the wooden seedling and progress bar above!</p>
               </div>
 
               {/* Task Adding Input Form */}
@@ -382,11 +377,11 @@ export default function Landing() {
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Carve a new task..."
+                  placeholder="Add a new task..."
                   className="demo-input sketch-border-sm"
                 />
                 <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow">
-                  <span>Carve It</span>
+                  <span>Add Task</span>
                 </button>
               </form>
 
@@ -405,6 +400,11 @@ export default function Landing() {
                     <span className="task-category-tag">{t.category}</span>
                   </div>
                 ))}
+                {tasks.length === 0 && (
+                  <div className="demo-empty-state sketch-border-sm handwritten">
+                    Add your first study task to begin the cabin workflow.
+                  </div>
+                )}
               </div>
             </div>
 
@@ -460,10 +460,10 @@ export default function Landing() {
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </div>
-            <p className="testimonial-text">
-              "Building study plan roadmaps with woodyy feels like organizing my desk drawer. It is so visual, slow, and therapeutic. My study plants are thriving!"
+              <p className="testimonial-text">
+              "Building study plan roadmaps here feels like organizing my desk drawer. It is so visual, slow, and therapeutic."
             </p>
-            <h4 className="student-name handwritten">- Aarav S., Biology Undergrad</h4>
+            <h4 className="student-name handwritten">- Mansi, Biology Student</h4>
           </div>
 
           {/* Testimonial Polaroid 2 */}
@@ -508,7 +508,7 @@ export default function Landing() {
                 <path d="M18 3.5V0" stroke="#2D2C24" strokeWidth="2" />
                 <path d="M18 1.5C18.8 0.5 20 0 21 0" stroke="#2D2C24" strokeWidth="1.8" />
               </svg>
-              <span className="font-bold">woodyy</span>
+              <span className="font-bold">Mansi</span>
             </div>
             <p className="footer-desc text-xs mt-2">
               A calm, structure-focused learning cabinet. Carving beautiful routines, organic plans, and mindful progress records.
@@ -540,7 +540,7 @@ export default function Landing() {
 
         <div className="footer-bottom">
           <p className="text-xxs font-mono text-center">
-            &copy; {new Date().getFullYear()} woodyy Planner Cabin. Hand-crafted in light yellowish theme. Keep carving knowledge slowly.
+            &copy; {new Date().getFullYear()} Mansi Planner Cabin. Hand-crafted in a warm study theme. Keep carving knowledge slowly.
           </p>
         </div>
       </footer>

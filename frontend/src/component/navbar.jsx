@@ -24,7 +24,7 @@ export default function Navbar() {
             <path d="M18 1.5C18.8 0.5 20 0 21 0" stroke="#2D2C24" strokeWidth="1.8" strokeLinecap="round" />
             <path d="M18 2C17.2 1 16 0.5 15 0.5" stroke="#2D2C24" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
-          <span className="logo-text">Woodyy</span>
+          <span className="logo-text">Mansi</span>
         </a>
 
         {/* Desktop Menu Links */}
