@@ -17,7 +17,7 @@ export default function LoginPage() {
   };
 
   const handleDemoLogin = () => {
-    setEmail('guest@woodyy.com');
+    setEmail('guest@mansi.com');
     setPassword('cozyfocus123');
     setFormSubmitted(true);
     setTimeout(() => {

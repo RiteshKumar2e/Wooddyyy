@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function WelcomeCard({ userName = 'Aarav Sharma' }) {
+export default function WelcomeCard({ userName = 'Mansi' }) {
   const [mood, setMood] = useState('focused'); // calm, focused, tired, inspired
   const [timeString, setTimeString] = useState('');
 
