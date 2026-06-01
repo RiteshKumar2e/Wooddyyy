@@ -148,7 +148,7 @@ export default function Dashboard() {
         /* ── Shell Layout ── */
         .dashboard-shell {
           display: flex;
-          min-height: 100vh;
+          min-height: 100dvh;
           background-color: var(--wood-bg);
           width: 100%;
           box-sizing: border-box;
@@ -173,10 +173,81 @@ export default function Dashboard() {
         .sidebar-open { width: 220px; }
         .sidebar-collapsed { width: 62px; }
 
+        @media (max-width: 1024px) {
+          .dashboard-shell {
+            flex-direction: column;
+          }
+
+          .dashboard-sidebar {
+            position: relative;
+            width: 100% !important;
+            height: auto;
+            max-height: none;
+            z-index: 150;
+          }
+
+          .sidebar-collapsed {
+            width: 100% !important;
+          }
+
+          .sidebar-brand,
+          .sidebar-nav,
+          .sidebar-footer {
+            width: 100%;
+          }
+
+          .dashboard-main {
+            width: 100%;
+          }
+        }
+
         @media (max-width: 768px) {
           .sidebar-open { width: 200px; position: fixed; top: 0; left: 0; height: 100vh; }
           .sidebar-collapsed { width: 0; overflow: hidden; }
           .mobile-sidebar-toggle { display: flex !important; }
+
+          .dash-topbar {
+            padding: 10px 16px;
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .dash-topbar-left {
+            width: 100%;
+          }
+
+          .topbar-breadcrumb {
+            font-size: 14px;
+            flex-wrap: wrap;
+          }
+
+          .topbar-user-chip {
+            width: 100%;
+            justify-content: center;
+          }
+
+          .dash-page-header {
+            margin: 16px 16px 0;
+            padding: 18px 18px;
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .page-header-icon {
+            font-size: 36px;
+          }
+
+          .page-header-title {
+            font-size: 22px;
+          }
+
+          .page-header-sub {
+            font-size: 15px;
+          }
+
+          .dash-content {
+            padding: 16px;
+          }
         }
 
         .sidebar-brand {

@@ -52,8 +52,8 @@ function App() {
         .main-content {
           flex: 1 0 auto;
           width: 100%;
-          max-width: 1200px;
-          margin: 0 auto;
+          max-width: none;
+          margin: 0;
           padding-bottom: 40px;
         }
       `}</style>
