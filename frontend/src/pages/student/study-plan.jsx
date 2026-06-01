@@ -167,7 +167,7 @@ export default function StudyPlan() {
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Branch Title *</label>
                 <input value={newChapterTitle} onChange={e => setNewChapterTitle(e.target.value)}
-                  placeholder="Branch title" className="form-input sketch-border-sm" required />
+                  placeholder="Enter a branch title" className="form-input sketch-border-sm" required />
               </div>
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Target Date</label>
@@ -177,15 +177,15 @@ export default function StudyPlan() {
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Study Time slot</label>
                 <input value={newChapterTime} onChange={e => setNewChapterTime(e.target.value)}
-                  placeholder="Study time window" className="form-input sketch-border-sm" />
+                  placeholder="Add a study window" className="form-input sketch-border-sm" />
               </div>
               <div className="form-group-sm full-width">
                 <label className="text-xxs font-bold">Quick Memo</label>
                 <input value={newChapterNotes} onChange={e => setNewChapterNotes(e.target.value)}
-                  placeholder="Quick memo" className="form-input sketch-border-sm" />
+                  placeholder="Add a short note or reminder" className="form-input sketch-border-sm" />
               </div>
             </div>
-            <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow mt-3 w-full justify-center">
+            <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow mt-3 w-full justify-center study-plan-submit-btn">
               + Plant Study Branch
             </button>
           </form>
@@ -262,6 +262,35 @@ export default function StudyPlan() {
         .form-group-sm { display: flex; flex-direction: column; gap: 4px; }
         .full-width { grid-column: span 3; }
         @media (max-width: 600px) { .full-width { grid-column: span 1; } }
+
+        .add-chapter-form-expanded .form-input {
+          background: var(--wood-card);
+          min-height: 44px;
+          padding: 10px 12px;
+          font-size: 14px;
+          border: 2px solid var(--wood-ink);
+          color: var(--wood-ink);
+        }
+
+        .add-chapter-form-expanded .form-input::placeholder {
+          color: var(--wood-ink-muted);
+          opacity: 0.75;
+        }
+
+        .add-chapter-form-expanded .form-input:focus {
+          background: #FFFDF0;
+          border-color: var(--wood-primary) !important;
+          box-shadow: 0 0 0 3px rgba(230, 168, 23, 0.12);
+        }
+
+        .study-plan-submit-btn {
+          min-height: 48px;
+          letter-spacing: -0.2px;
+        }
+
+        .study-plan-submit-btn:hover {
+          transform: translateY(-1px);
+        }
         
         .color-primary { color: var(--wood-primary-hover); }
       `}</style>
