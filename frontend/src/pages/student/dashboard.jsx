@@ -7,6 +7,7 @@ import Quiz from './quiz.jsx';
 import ProgressChart from './progress-chart.jsx';
 import ExamPrepStrat from './exam-prep-strat.jsx';
 import TimeTable from './time-table.jsx';
+import Profile from './profile.jsx';
 
 const navItems = [
   { id: 'welcome',  label: 'Welcome',            icon: '🏠', emoji: true },
@@ -17,6 +18,7 @@ const navItems = [
   { id: 'progress', label: 'Progress Chart',      icon: '📊', emoji: true },
   { id: 'examprep', label: 'Exam Prep Strategy',  icon: '🏆', emoji: true },
   { id: 'timetable',label: 'Timetable',           icon: '⏰', emoji: true },
+  { id: 'profile',  label: 'Profile',            icon: '👤', emoji: true },
 ];
 
 const componentMap = {
@@ -28,6 +30,7 @@ const componentMap = {
   progress:  <ProgressChart />,
   examprep:  <ExamPrepStrat />,
   timetable: <TimeTable />,
+  profile:   <Profile />,
 };
 
 export default function Dashboard() {
@@ -128,6 +131,7 @@ export default function Dashboard() {
               {active === 'progress'  && 'Watch your subjects grow 🌱'}
               {active === 'examprep'  && 'Your 3-phase exam roadmap 🏆'}
               {active === 'timetable' && 'Slow, mindful weekly schedule ⏰'}
+              {active === 'profile'   && 'Update your details and preferences 👤'}
             </p>
           </div>
         </div>
