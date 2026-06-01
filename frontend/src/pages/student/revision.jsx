@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 
-const initialNotes = [
-  { id: 1, subject: 'Biology', keyword: 'Mitosis', detail: 'Cell division producing 2 identical daughter cells. Phases: Prophase, Metaphase, Anaphase, Telophase.', tag: 'must-revise', color: 'yellow', date: '2026-06-03', time: '04:30 PM', resource: 'CellBiology_Syllabus.pdf' },
-  { id: 2, subject: 'Chemistry', keyword: 'SN2 Reaction', detail: 'Bimolecular nucleophilic substitution. Backside attack, inversion of configuration. Rate = k[substrate][nucleophile].', tag: 'tricky', color: 'pink', date: '2026-06-03', time: '11:30 AM', resource: 'OrganicChemistryNotes.png' },
-  { id: 3, subject: 'Mathematics', keyword: 'Integration by Parts', detail: '∫u dv = uv − ∫v du. Choose u using LIATE rule.', tag: 'formula', color: 'green', date: '2026-06-05', time: '02:00 PM', resource: 'CalculusCheatSheet.pdf' },
-  { id: 4, subject: 'Biology', keyword: 'Meiosis', detail: 'Two-stage division producing 4 haploid cells. Crossing over occurs in Prophase I.', tag: 'must-revise', color: 'yellow', date: '2026-06-04', time: '09:00 AM', resource: 'CellBiology_Syllabus.pdf' },
-];
+const initialNotes = [];
 
 const tags = ['all', 'must-revise', 'tricky', 'formula'];
 const colors = { yellow: 'var(--note-yellow)', pink: 'var(--note-pink)', green: 'var(--note-green)' };
@@ -26,8 +21,8 @@ export default function Revision() {
     detail: '', 
     tag: 'must-revise', 
     color: 'yellow', 
-    date: '2026-06-06', 
-    time: '10:00 AM',
+    date: '', 
+    time: '',
     resource: 'None'
   });
   
@@ -43,7 +38,7 @@ export default function Revision() {
     if (!form.keyword || !form.detail || !form.subject) return;
     const finalForm = { ...form, id: Date.now(), resource: selectedFileMock || 'None' };
     setNotes([...notes, finalForm]);
-    setForm({ subject: '', keyword: '', detail: '', tag: 'must-revise', color: 'yellow', date: '2026-06-06', time: '10:00 AM', resource: 'None' });
+    setForm({ subject: '', keyword: '', detail: '', tag: 'must-revise', color: 'yellow', date: '', time: '', resource: 'None' });
     setSelectedFileMock('');
     setShowForm(false);
   };
@@ -76,7 +71,7 @@ export default function Revision() {
     <div className="revision-panel">
       <div className="panel-header">
         <h2 className="panel-title">🔁 Revision Desk</h2>
-        <p className="panel-subtitle">Review keywords with flashcards, associate syllabus sheets, and track exact schedules.</p>
+        <p className="panel-subtitle">Create revision cards from your own notes. No sample cards are prefilled.</p>
       </div>
 
       {/* Mode Switches */}
@@ -111,13 +106,13 @@ export default function Revision() {
           </div>
           <div className="modal-body text-center py-6">
             <span className="folder-large-icon">📂</span>
-            <p className="handwritten mt-2">Active syllabus or notes sheet associated with this chapter branch.</p>
+            <p className="handwritten mt-2">Attach a resource to preview your own notes.</p>
             <div className="mock-file-content sketch-border-sm mt-3">
               <p className="text-xxs font-bold text-gray-500 uppercase border-bottom pb-1">Milestone Highlights</p>
               <ul className="text-left text-xs list-disc pl-4 mt-2 leading-relaxed">
-                <li>Primary vocabulary reviewed & spaced.</li>
-                <li>Core formula: verified and parsed.</li>
-                <li>Assessment timeline locked.</li>
+                <li>No demo content is stored here.</li>
+                <li>Upload a resource to see a preview.</li>
+                <li>Add your own revision notes to build the deck.</li>
               </ul>
             </div>
           </div>
@@ -131,17 +126,17 @@ export default function Revision() {
           <div className="form-row-2">
             <div className="form-group">
               <label className="form-label">Subject *</label>
-              <input value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} placeholder="e.g. Biology" className="form-input sketch-border-sm" required />
+              <input value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} placeholder="Subject" className="form-input sketch-border-sm" required />
             </div>
             <div className="form-group">
               <label className="form-label">Keyword / Topic *</label>
-              <input value={form.keyword} onChange={e => setForm({ ...form, keyword: e.target.value })} placeholder="e.g. Mitosis" className="form-input sketch-border-sm" required />
+              <input value={form.keyword} onChange={e => setForm({ ...form, keyword: e.target.value })} placeholder="Keyword / Topic" className="form-input sketch-border-sm" required />
             </div>
           </div>
           
           <div className="form-group">
             <label className="form-label">Revision Details / Core takeaways *</label>
-            <textarea value={form.detail} onChange={e => setForm({ ...form, detail: e.target.value })} placeholder="Jot down the key points, definitions, formulas..." className="form-input sketch-border-sm" rows={3} required />
+            <textarea value={form.detail} onChange={e => setForm({ ...form, detail: e.target.value })} placeholder="Revision notes" className="form-input sketch-border-sm" rows={3} required />
           </div>
 
           {/* Sibling File upload for Revision Planning */}
@@ -187,7 +182,9 @@ export default function Revision() {
       {/* VIEW 1: Flashcard Deck view */}
       {viewMode === 'deck' && (
         <div className="flashcards-grid">
-          {filtered.map(n => (
+          {filtered.length === 0 ? (
+            <div className="empty-revision-state sketch-border-sm">No revision cards yet. Add one from your own notes.</div>
+          ) : filtered.map(n => (
             <div key={n.id} className={`flashcard-wrap ${flipped[n.id] ? 'is-flipped' : ''}`} onClick={() => toggleFlip(n.id)}>
               <div className="flashcard-inner">
                 {/* Front */}
@@ -288,6 +285,7 @@ export default function Revision() {
       <style>{`
         .revision-panel { display: flex; flex-direction: column; gap: 24px; }
         
+        .empty-revision-state { background: var(--wood-card); padding: 18px; color: var(--wood-ink-muted); }
         .mode-switch-row { display: flex; gap: 12px; border-bottom: 2px dashed var(--wood-border-light); padding-bottom: 12px; }
         .mode-btn { background: var(--wood-card); border: 2px solid var(--wood-ink); padding: 8px 16px; font-family: var(--heading); font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .mode-btn.mode-active { background: var(--wood-accent); box-shadow: 2px 2px 0 var(--wood-ink); }

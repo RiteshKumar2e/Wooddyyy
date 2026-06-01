@@ -1,21 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// Sample generated objective questions bank
-const defaultObjectiveQuestions = [
-  { id: 1, subject: 'Biology', question: 'What are the four phases of Mitosis in order?', options: ['Prophase, Metaphase, Anaphase, Telophase', 'Interphase, Prophase, Cytokinesis, Anaphase', 'Metaphase, Telophase, Prophase, Anaphase', 'Anaphase, Prophase, Telophase, Metaphase'], correct: 0, explanation: 'Mitosis follows the PMAT sequence: Prophase → Metaphase → Anaphase → Telophase.' },
-  { id: 2, subject: 'Chemistry', question: 'In SN2 reactions, the nucleophile attacks from which side?', options: ['Same side as leaving group', 'Backside — opposite to the leaving group', 'Either side randomly', 'Top of the molecule'], correct: 1, explanation: 'SN2 uses a backside attack, causing inversion of configuration (Walden inversion).' },
-  { id: 3, subject: 'Mathematics', question: 'Integration by Parts: ∫u dv = ?', options: ['uv + ∫v du', 'u/v − ∫v du', 'uv − ∫v du', '∫u/v dv'], correct: 2, explanation: 'IBP formula: ∫u dv = uv − ∫v du. Choose u with LIATE rule.' },
-  { id: 4, subject: 'Biology', question: 'Meiosis produces how many daughter cells?', options: ['2 identical diploid cells', '4 identical diploid cells', '4 genetically unique haploid cells', '2 genetically unique haploid cells'], correct: 2, explanation: 'Meiosis I and II together produce 4 genetically unique haploid cells due to crossing-over.' },
-  { id: 5, subject: 'Chemistry', question: 'Which element has the highest electronegativity?', options: ['Oxygen', 'Chlorine', 'Fluorine', 'Nitrogen'], correct: 2, explanation: 'Fluorine (F) has the highest electronegativity value of 3.98 on the Pauling scale.' },
-];
-
-// Sample generated subjective questions bank
-const defaultSubjectiveQuestions = [
-  { id: 101, subject: 'Biology', question: 'Explain the critical differences between Mitosis and Meiosis.', sampleAnswer: 'Mitosis occurs in somatic cells, producing 2 genetically identical diploid (2n) daughter cells for growth/repair with 1 division cycle. Meiosis occurs in germ cells, producing 4 genetically unique haploid (n) gametes for sexual reproduction through 2 division cycles, including homologous recombination (crossing-over) in Prophase I.', explanation: 'Mitosis maintains chromosome number; Meiosis halves it. Recombination only happens in Meiosis.' },
-  { id: 102, subject: 'Chemistry', question: 'Compare and contrast the mechanism and rate laws of SN1 and SN2 nucleophilic substitution reactions.', sampleAnswer: 'SN1 is a unimolecular, two-step reaction involving a carbocation intermediate, with a rate law of Rate = k[substrate]. It leads to racemization. SN2 is a bimolecular, single-step concerted reaction with no intermediates, showing rate law Rate = k[substrate][nucleophile], resulting in stereochemical backside inversion.', explanation: 'SN1 rate depends on substrate concentration only; SN2 depends on both substrate and nucleophile.' },
-  { id: 103, subject: 'Mathematics', question: 'Explain the purpose and mechanics of the LIATE rule in Integration by Parts.', sampleAnswer: 'LIATE stands for Logarithmic, Inverse trigonometric, Algebraic, Trigonometric, and Exponential. It is a heuristic rule of thumb to choose the function "u" when applying the integration by parts formula ∫u dv = uv - ∫v du. Functions higher up the list are easier to differentiate and harder to integrate, making them the priority choice for u.', explanation: 'Choose u by matching the highest function type in LIATE order; the rest becomes dv.' }
-];
-
 export default function Quiz() {
   // Setup States
   const [setupMode, setSetupMode] = useState(true);
@@ -94,6 +78,12 @@ export default function Quiz() {
 
   // Question generator
   const triggerGeneration = () => {
+    if (!fileUploaded) {
+      setQuizQuestions([]);
+      setSetupMode(true);
+      return;
+    }
+
     setGenerating(true);
     setGenerateStep('Opening file binder... 📁');
     setTimeout(() => {
@@ -101,42 +91,24 @@ export default function Quiz() {
       setTimeout(() => {
         setGenerateStep('Carving custom choices and solution rubrics... 🌿');
         setTimeout(() => {
-          // Select source questions based on chosen subject and type
-          let source = quizType === 'objective' ? defaultObjectiveQuestions : defaultSubjectiveQuestions;
-          if (subjectFilter !== 'All') {
-            source = source.filter(q => q.subject === subjectFilter);
-          }
+          const generatedQuestion = quizType === 'objective'
+            ? {
+                id: 998,
+                subject: subjectFilter === 'All' ? 'Uploaded File' : subjectFilter,
+                question: `Your uploaded file, ${fileName.substring(0, 10)}, is ready for a real quiz generator. Connect a question source to continue.`,
+                options: ['No questions available', 'Upload more files', 'Connect a backend generator', 'All of the above'],
+                correct: 3,
+                explanation: 'Demo question banks were removed. This placeholder only reflects uploaded content.'
+              }
+            : {
+                id: 999,
+                subject: subjectFilter === 'All' ? 'Uploaded File' : subjectFilter,
+                question: `Your uploaded file, ${fileName.substring(0, 10)}, is ready for a real quiz generator. Connect a question source to continue.`,
+                sampleAnswer: 'No demo answer is bundled here.',
+                explanation: 'Demo question banks were removed. This placeholder only reflects uploaded content.'
+              };
 
-          // If a file was uploaded, let's "append" two custom mock topics derived from the uploaded filename!
-          if (fileUploaded) {
-            const topicPrefix = fileName.substring(0, 10);
-            if (quizType === 'objective') {
-              source = [
-                ...source,
-                {
-                  id: 998,
-                  subject: subjectFilter === 'All' ? 'Custom Note' : subjectFilter,
-                  question: `[Parsed from ${topicPrefix}] Which of the following is most crucial for optimizing this specific syllabus branch?`,
-                  options: ['Iterative spaced recall sessions', 'Simulating timer conditions', 'Comprehensive mind maps', 'All of the above'],
-                  correct: 3,
-                  explanation: 'All methods combine to trigger active learning. Regular retrieval is proven to double memory locks.'
-                }
-              ];
-            } else {
-              source = [
-                ...source,
-                {
-                  id: 999,
-                  subject: subjectFilter === 'All' ? 'Custom Note' : subjectFilter,
-                  question: `[Parsed from ${topicPrefix}] Summarize the principal learning milestones indicated in your uploaded syllabus.`,
-                  sampleAnswer: 'The core milestones demand regular retrieval practice, allocating spaced study windows, utilizing active flashcards, and testing under timed subjective/objective environments.',
-                  explanation: 'Syllabus guidelines are best locked through cyclic assessments.'
-                }
-              ];
-            }
-          }
-
-          setQuizQuestions(source);
+          setQuizQuestions([generatedQuestion]);
           setCurrentIndex(0);
           setSelectedOption(null);
           setSubjectiveInput('');
@@ -225,7 +197,7 @@ export default function Quiz() {
       <div className="quiz-panel">
         <div className="panel-header">
           <h2 className="panel-title">📝 Modular Study Cabin Quiz</h2>
-          <p className="panel-subtitle">Carve question banks by uploading files or select standard cabin study plans.</p>
+          <p className="panel-subtitle">Upload your own file to build a quiz. No sample bank is bundled here.</p>
         </div>
 
         {generating ? (
@@ -243,7 +215,7 @@ export default function Quiz() {
                 <span className="upload-main-icon">📄</span>
                 <h3 className="font-bold text-base">File-to-Quiz Wizard</h3>
               </div>
-              <p className="text-xs text-gray-600 mb-4">Upload a Syllabus PDF, study notes, or question bank images to automatically generate customized practice questions!</p>
+              <p className="text-xs text-gray-600 mb-4">Upload your own syllabus or notes to build a quiz from your content.</p>
               
               {fileUploaded ? (
                 <div className="file-success-badge sketch-border-sm">
@@ -269,10 +241,10 @@ export default function Quiz() {
                 <label className="config-label">Question Type</label>
                 <div className="config-options">
                   <button onClick={() => setQuizType('objective')} className={`config-btn sketch-border-sm ${quizType === 'objective' ? 'active' : ''}`}>
-                    🎯 Objective (30s limit)
+                    🎯 Objective
                   </button>
                   <button onClick={() => setQuizType('subjective')} className={`config-btn sketch-border-sm ${quizType === 'subjective' ? 'active' : ''}`}>
-                    📝 Subjective (3m limit)
+                    📝 Subjective
                   </button>
                 </div>
               </div>
@@ -281,16 +253,13 @@ export default function Quiz() {
                 <div className="config-group">
                   <label className="config-label">Subject Scope</label>
                   <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)} className="config-select sketch-border-sm">
-                    <option value="All">All Cabin Subjects</option>
-                    <option value="Biology">Biology</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Mathematics">Mathematics</option>
+                    <option value="All">All Subjects</option>
                   </select>
                 </div>
               </div>
 
               <button onClick={triggerGeneration} className="btn-sketch btn-sketch-primary sketch-border sketch-shadow w-full justify-center mt-6">
-                🔥 Generate Custom Quiz
+                🔥 Build Quiz From Upload
               </button>
             </div>
 
@@ -539,6 +508,21 @@ export default function Quiz() {
 
   // RENDER ACTIVE QUIZ VIEW
   const q = quizQuestions[currentIndex];
+
+  if (!q) {
+    return (
+      <div className="quiz-panel">
+        <div className="panel-header">
+          <h2 className="panel-title">📝 Parchment Active Assessment</h2>
+          <p className="panel-subtitle">Upload your own file to start a quiz. No bundled question data is shown here.</p>
+        </div>
+        <div className="quiz-empty-state sketch-border sketch-shadow">
+          <p className="handwritten text-xl">No quiz content yet.</p>
+          <p className="text-sm mt-2">Upload a syllabus or notes file above to generate your own questions.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="quiz-panel">
