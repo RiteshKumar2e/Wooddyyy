@@ -79,7 +79,7 @@ export default function Landing() {
           </h1>
 
           <p className="hero-subtitle">
-            Say goodbye to cold, robotic, notification-heavy dashboards. <strong>Mansi</strong> is a mindful digital study cabinet crafted with warm wood rings, hand-drawn planners, tactile quizzes, and revision branches designed to make focus feel organic and calming.
+            Say goodbye to cold, robotic, notification-heavy dashboards. <strong>Woody</strong> is a mindful digital study cabinet crafted with warm wood rings, hand-drawn planners, tactile quizzes, and revision branches designed to make focus feel organic and calming.
           </p>
 
           <div className="hero-actions">
@@ -260,7 +260,7 @@ export default function Landing() {
             <div className="desk-notebook sketch-border-sm">
               <div className="notebook-binder"></div>
               <div className="notebook-page-left">
-                <h4 className="notebook-h4">Mansi Desk</h4>
+                <h4 className="notebook-h4">Woody Desk</h4>
                 <p className="notebook-p">Interactive study objects react to your focus routine.</p>
                 <div className="paper-doodle">
                   <svg width="70" height="20" viewBox="0 0 70 20" fill="none">
@@ -463,7 +463,7 @@ export default function Landing() {
               <p className="testimonial-text">
               "Building study plan roadmaps here feels like organizing my desk drawer. It is so visual, slow, and therapeutic."
             </p>
-            <h4 className="student-name handwritten">- Mansi, Biology Student</h4>
+            <h4 className="student-name handwritten">- Woody, Biology Student</h4>
           </div>
 
           {/* Testimonial Polaroid 2 */}
@@ -508,7 +508,7 @@ export default function Landing() {
                 <path d="M18 3.5V0" stroke="#2D2C24" strokeWidth="2" />
                 <path d="M18 1.5C18.8 0.5 20 0 21 0" stroke="#2D2C24" strokeWidth="1.8" />
               </svg>
-              <span className="font-bold">Mansi</span>
+              <span className="font-bold">Woody</span>
             </div>
             <p className="footer-desc text-xs mt-2">
               A calm, structure-focused learning cabinet. Carving beautiful routines, organic plans, and mindful progress records.
@@ -540,7 +540,7 @@ export default function Landing() {
 
         <div className="footer-bottom">
           <p className="text-xxs font-mono text-center">
-            &copy; {new Date().getFullYear()} Mansi Planner Cabin. Hand-crafted in a warm study theme. Keep carving knowledge slowly.
+            &copy; {new Date().getFullYear()} Woody Planner Cabin. Hand-crafted in a warm study theme. Keep carving knowledge slowly.
           </p>
         </div>
       </footer>

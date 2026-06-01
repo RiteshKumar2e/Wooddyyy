@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import WelcomeCard from './welcome-card.jsx';
 import Summary from './summary.jsx';
 import StudyPlan from './study-plan.jsx';
@@ -8,6 +8,14 @@ import ProgressChart from './progress-chart.jsx';
 import ExamPrepStrat from './exam-prep-strat.jsx';
 import TimeTable from './time-table.jsx';
 import Profile from './profile.jsx';
+
+const defaultProfile = {
+  fullName: 'Woody',
+  email: 'guest@woody.com',
+  phone: '',
+  goal: 'Stay consistent with study blocks',
+  timezone: 'IST',
+};
 
 const navItems = [
   { id: 'welcome',  label: 'Welcome',            icon: '🏠', emoji: true },
@@ -22,7 +30,7 @@ const navItems = [
 ];
 
 const componentMap = {
-  welcome:   <WelcomeCard userName="Mansi" />,
+  welcome:   <WelcomeCard userName="Woody" />,
   summary:   <Summary />,
   studyplan: <StudyPlan />,
   revision:  <Revision />,
@@ -30,14 +38,36 @@ const componentMap = {
   progress:  <ProgressChart />,
   examprep:  <ExamPrepStrat />,
   timetable: <TimeTable />,
-  profile:   <Profile />,
 };
 
 export default function Dashboard() {
   const [active, setActive] = useState('welcome');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [profile, setProfile] = useState(defaultProfile);
+
+  useEffect(() => {
+    try {
+      const storedProfile = window.localStorage.getItem('woody-profile');
+      if (storedProfile) {
+        setProfile({ ...defaultProfile, ...JSON.parse(storedProfile) });
+      }
+    } catch {
+      setProfile(defaultProfile);
+    }
+  }, []);
+
+  const handleProfileSave = (nextProfile) => {
+    const mergedProfile = { ...defaultProfile, ...nextProfile };
+    setProfile(mergedProfile);
+    try {
+      window.localStorage.setItem('woody-profile', JSON.stringify(mergedProfile));
+    } catch {
+      // Ignore storage failures and keep the session state working.
+    }
+  };
 
   const activeItem = navItems.find(n => n.id === active);
+  const displayName = profile.fullName?.trim() || 'Woody';
 
   return (
     <div className="dashboard-shell">
@@ -54,7 +84,7 @@ export default function Dashboard() {
             <path d="M18 1.5C18.8 0.5 20 0 21 0" stroke="#2D2C24" strokeWidth="1.8" strokeLinecap="round" />
             <path d="M18 2C17.2 1 16 0.5 15 0.5" stroke="#2D2C24" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
-          {sidebarOpen && <span className="sidebar-brand-name">Mansi</span>}
+          {sidebarOpen && <span className="sidebar-brand-name">Woody</span>}
         </div>
 
         {/* Collapse toggle */}
@@ -103,14 +133,14 @@ export default function Dashboard() {
               </svg>
             </button>
             <span className="topbar-breadcrumb">
-              <span className="topbar-home">Mansi Cabin</span>
+              <span className="topbar-home">Woody Cabin</span>
               <span className="topbar-sep">›</span>
               <span className="topbar-current">{activeItem?.label}</span>
             </span>
           </div>
           <div className="topbar-user-chip sketch-border-sm">
             <span className="user-avatar-emoji">🌿</span>
-            <span className="user-name-chip">Mansi</span>
+            <span className="user-name-chip">{displayName}</span>
           </div>
         </div>
 
@@ -138,7 +168,12 @@ export default function Dashboard() {
 
         {/* Page Content */}
         <div className="dash-content">
-          {componentMap[active]}
+          {active === 'profile'
+            ? <Profile profile={profile} onSave={handleProfileSave} />
+            : active === 'welcome'
+              ? <WelcomeCard userName={displayName} />
+              : componentMap[active]
+          }
         </div>
       </main>
 
