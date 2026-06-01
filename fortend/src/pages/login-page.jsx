@@ -16,6 +16,15 @@ export default function LoginPage() {
     }, 1500);
   };
 
+  const handleDemoLogin = () => {
+    setEmail('guest@woodyy.com');
+    setPassword('cozyfocus123');
+    setFormSubmitted(true);
+    setTimeout(() => {
+      window.location.hash = '#student-dashboard';
+    }, 1500);
+  };
+
   return (
     <div className="login-container">
       {/* Pinned Note Accent */}
@@ -133,6 +142,12 @@ export default function LoginPage() {
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
+            </button>
+
+            {/* Demo Login Button */}
+            <button type="button" onClick={handleDemoLogin} className="btn-sketch sketch-border sketch-shadow w-full justify-center mt-2" style={{ backgroundColor: 'var(--wood-accent)' }}>
+              <span>🔑 Try Demo Desk</span>
+              <span className="handwritten ml-2 text-base" style={{ color: 'var(--wood-ink)' }}>quick preview!</span>
             </button>
           </form>
         )}

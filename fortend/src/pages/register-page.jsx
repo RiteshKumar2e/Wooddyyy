@@ -21,8 +21,8 @@ export default function RegisterPage() {
 
     setFormSubmitted(true);
     setTimeout(() => {
-      // Mock navigation to login
-      window.location.hash = '#login';
+      // Mock navigation to dashboard
+      window.location.hash = '#student-dashboard';
     }, 1800);
   };
 
@@ -69,7 +69,7 @@ export default function RegisterPage() {
                 <circle cx="40" cy="25" r="5" fill="#FFFDF9" stroke="#2D2C24" strokeWidth="1.5" />
               </svg>
             </div>
-            <p className="text-xs text-gray-500 mt-3">Redirecting you to the entry door...</p>
+            <p className="text-xs text-gray-500 mt-3">Opening your cabin dashboard...</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="register-form">
