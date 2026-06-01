@@ -81,7 +81,7 @@ export default function StudyPlan() {
     <div className="study-plan-panel">
       <div className="panel-header">
         <h2 className="panel-title">🗺️ Study Plan Branches</h2>
-        <p className="panel-subtitle">Add your own subjects and chapters. No sample study plan is preloaded.</p>
+        <p className="panel-subtitle">Add your own subjects and chapters to begin planning.</p>
       </div>
 
       {/* Syllabus Upload Block */}
@@ -167,7 +167,7 @@ export default function StudyPlan() {
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Branch Title *</label>
                 <input value={newChapterTitle} onChange={e => setNewChapterTitle(e.target.value)}
-                  placeholder="e.g. Thermodynamics basics" className="form-input sketch-border-sm" required />
+                  placeholder="Branch title" className="form-input sketch-border-sm" required />
               </div>
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Target Date</label>
@@ -177,12 +177,12 @@ export default function StudyPlan() {
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Study Time slot</label>
                 <input value={newChapterTime} onChange={e => setNewChapterTime(e.target.value)}
-                  placeholder="e.g. 10:00 AM - 12:00 PM" className="form-input sketch-border-sm" />
+                  placeholder="Study time window" className="form-input sketch-border-sm" />
               </div>
               <div className="form-group-sm full-width">
                 <label className="text-xxs font-bold">Quick Memo</label>
                 <input value={newChapterNotes} onChange={e => setNewChapterNotes(e.target.value)}
-                  placeholder="e.g. Focus on past formulas" className="form-input sketch-border-sm" />
+                  placeholder="Quick memo" className="form-input sketch-border-sm" />
               </div>
             </div>
             <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow mt-3 w-full justify-center">

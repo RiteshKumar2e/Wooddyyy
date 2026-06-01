@@ -10,11 +10,11 @@ import TimeTable from './time-table.jsx';
 import Profile from './profile.jsx';
 
 const defaultProfile = {
-  fullName: 'Woody',
-  email: 'guest@woody.com',
+  fullName: '',
+  email: '',
   phone: '',
-  goal: 'Stay consistent with study blocks',
-  timezone: 'IST',
+  goal: '',
+  timezone: '',
 };
 
 const navItems = [
@@ -67,7 +67,7 @@ export default function Dashboard() {
   };
 
   const activeItem = navItems.find(n => n.id === active);
-  const displayName = profile.fullName?.trim() || 'Woody';
+  const displayName = profile.fullName?.trim() || 'Set profile name';
 
   return (
     <div className="dashboard-shell">

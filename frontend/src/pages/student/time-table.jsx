@@ -4,12 +4,12 @@ const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 const timeSlots = ['7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM'];
 
 const subjectColors = {
-  Biology: { bg: 'var(--wood-sage)', border: '#88C088' },
-  Chemistry: { bg: 'var(--wood-accent)', border: '#E6A817' },
-  Mathematics: { bg: 'var(--wood-clay)', border: '#F4A261' },
-  History: { bg: 'var(--wood-sky)', border: '#A8DADC' },
+  Focus: { bg: 'var(--wood-sage)', border: '#88C088' },
+  Practice: { bg: 'var(--wood-accent)', border: '#E6A817' },
+  Notes: { bg: 'var(--wood-clay)', border: '#F4A261' },
+  Review: { bg: 'var(--wood-sky)', border: '#A8DADC' },
   Break: { bg: '#F3E5F5', border: '#CE93D8' },
-  Revision: { bg: '#FFF9C4', border: '#F9A825' },
+  CatchUp: { bg: '#FFF9C4', border: '#F9A825' },
 };
 
 const initialBlocks = [];
@@ -18,7 +18,7 @@ export default function TimeTable() {
   const [blocks, setBlocks] = useState(initialBlocks);
   const [activeDay, setActiveDay] = useState('Monday');
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ day: 'Monday', start: '8:00 AM', end: '9:00 AM', subject: 'Subject', note: '' });
+  const [form, setForm] = useState({ day: 'Monday', start: '8:00 AM', end: '9:00 AM', subject: 'Focus', note: '' });
   const [deleteId, setDeleteId] = useState(null);
 
   const dayBlocks = blocks.filter(b => b.day === activeDay);
@@ -26,7 +26,7 @@ export default function TimeTable() {
   const addBlock = (e) => {
     e.preventDefault();
     setBlocks([...blocks, { ...form, id: Date.now() }]);
-    setForm({ day: activeDay, start: '8:00 AM', end: '9:00 AM', subject: 'Subject', note: '' });
+    setForm({ day: activeDay, start: '8:00 AM', end: '9:00 AM', subject: 'Focus', note: '' });
     setShowForm(false);
   };
 
@@ -40,7 +40,7 @@ export default function TimeTable() {
     <div className="timetable-panel">
       <div className="panel-header">
         <h2 className="panel-title">⏰ Hourglass Timetable</h2>
-        <p className="panel-subtitle">Add your own focus blocks. No sample timetable is preloaded.</p>
+        <p className="panel-subtitle">Add your own focus blocks to shape the week.</p>
       </div>
 
       {/* Quick Stats Strip */}
@@ -104,7 +104,7 @@ export default function TimeTable() {
               <div className="form-group">
                 <label className="form-label">Subject</label>
                 <select value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className="form-input sketch-border-sm">
-                  {Object.keys(subjectColors).filter(s => s !== 'Break' && s !== 'Revision').map(s => <option key={s}>{s}</option>)}
+                  {Object.keys(subjectColors).filter(s => s !== 'Break').map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
             </div>

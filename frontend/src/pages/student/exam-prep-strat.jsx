@@ -20,7 +20,7 @@ export default function ExamPrepStrat() {
     <div className="exam-prep-panel">
       <div className="panel-header">
         <h2 className="panel-title">🏆 Exam Preparation Strategy</h2>
-        <p className="panel-subtitle">Build your own exam roadmap. No sample strategies are preloaded.</p>
+        <p className="panel-subtitle">Build your own exam roadmap from scratch.</p>
       </div>
 
       {/* Subject Tab Selector */}

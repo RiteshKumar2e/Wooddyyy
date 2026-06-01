@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
 const fallbackProfile = {
-  fullName: 'Woody',
-  email: 'guest@woody.com',
+  fullName: '',
+  email: '',
   phone: '',
-  goal: 'Stay consistent with study blocks',
-  timezone: 'IST',
+  goal: '',
+  timezone: '',
 };
 
 export default function Profile({ profile: profileProp, onSave }) {
@@ -38,10 +38,10 @@ export default function Profile({ profile: profileProp, onSave }) {
 
       <div className="profile-layout sketch-border sketch-shadow">
         <div className="profile-card-preview sketch-border-sm">
-          <div className="profile-avatar">{(profile.fullName || 'W').trim().charAt(0).toUpperCase()}</div>
-          <h3 className="profile-name">{profile.fullName || 'Woody'}</h3>
-          <p className="profile-mail">{profile.email || 'guest@woody.com'}</p>
-          <div className="profile-badge">{profile.timezone}</div>
+          <div className="profile-avatar">{profile.fullName ? profile.fullName.trim().charAt(0).toUpperCase() : '—'}</div>
+          <h3 className="profile-name">{profile.fullName || 'Your name here'}</h3>
+          <p className="profile-mail">{profile.email || 'Add your email in the form'}</p>
+          <div className="profile-badge">{profile.timezone || 'Timezone'}</div>
         </div>
 
         <form className="profile-form" onSubmit={handleSubmit}>
@@ -65,6 +65,7 @@ export default function Profile({ profile: profileProp, onSave }) {
                 value={profile.timezone}
                 onChange={handleChange('timezone')}
               >
+                <option value="" disabled>Select timezone</option>
                 <option value="IST">IST</option>
                 <option value="UTC">UTC</option>
                 <option value="GMT">GMT</option>

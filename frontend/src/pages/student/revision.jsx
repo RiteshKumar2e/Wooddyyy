@@ -12,7 +12,7 @@ export default function Revision() {
   const [showForm, setShowForm] = useState(false);
   const [viewMode, setViewMode] = useState('deck'); // 'deck' or 'subject-wise'
   
-  // Custom revision file picker mock state
+  // Attached resource state
   const [selectedFileMock, setSelectedFileMock] = useState('');
 
   const [form, setForm] = useState({ 
@@ -71,7 +71,7 @@ export default function Revision() {
     <div className="revision-panel">
       <div className="panel-header">
         <h2 className="panel-title">🔁 Revision Desk</h2>
-        <p className="panel-subtitle">Create revision cards from your own notes. No sample cards are prefilled.</p>
+        <p className="panel-subtitle">Create revision cards from your own notes.</p>
       </div>
 
       {/* Mode Switches */}
@@ -106,11 +106,11 @@ export default function Revision() {
           </div>
           <div className="modal-body text-center py-6">
             <span className="folder-large-icon">📂</span>
-            <p className="handwritten mt-2">Attach a resource to preview your own notes.</p>
+            <p className="handwritten mt-2">Attach a resource to preview your notes.</p>
             <div className="mock-file-content sketch-border-sm mt-3">
               <p className="text-xxs font-bold text-gray-500 uppercase border-bottom pb-1">Milestone Highlights</p>
               <ul className="text-left text-xs list-disc pl-4 mt-2 leading-relaxed">
-                <li>No demo content is stored here.</li>
+                <li>No attached resource is loaded yet.</li>
                 <li>Upload a resource to see a preview.</li>
                 <li>Add your own revision notes to build the deck.</li>
               </ul>
@@ -163,7 +163,7 @@ export default function Revision() {
             </div>
             <div className="form-group">
               <label className="form-label">Target Time *</label>
-              <input value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} placeholder="e.g. 04:30 PM" className="form-input sketch-border-sm" required />
+              <input value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} placeholder="Target time" className="form-input sketch-border-sm" required />
             </div>
             <div className="form-group">
               <label className="form-label">Tag</label>

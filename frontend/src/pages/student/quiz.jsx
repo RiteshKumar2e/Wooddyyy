@@ -68,7 +68,7 @@ export default function Quiz() {
     }
   };
 
-  // Mock Upload Syllabus / Notes / Question Bank
+  // Upload your own syllabus, notes, or question bank
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -96,16 +96,16 @@ export default function Quiz() {
                 id: 998,
                 subject: subjectFilter === 'All' ? 'Uploaded File' : subjectFilter,
                 question: `Your uploaded file, ${fileName.substring(0, 10)}, is ready for a real quiz generator. Connect a question source to continue.`,
-                options: ['No questions available', 'Upload more files', 'Connect a backend generator', 'All of the above'],
-                correct: 3,
-                explanation: 'Demo question banks were removed. This placeholder only reflects uploaded content.'
+                options: ['Upload a source', 'Add more notes', 'Connect a generator', 'Create my own quiz'],
+                correct: 0,
+                explanation: 'No built-in question bank is loaded. This question is based on your uploaded content only.'
               }
             : {
                 id: 999,
                 subject: subjectFilter === 'All' ? 'Uploaded File' : subjectFilter,
                 question: `Your uploaded file, ${fileName.substring(0, 10)}, is ready for a real quiz generator. Connect a question source to continue.`,
-                sampleAnswer: 'No demo answer is bundled here.',
-                explanation: 'Demo question banks were removed. This placeholder only reflects uploaded content.'
+                sampleAnswer: '',
+                explanation: 'No reference answer is prefilled. Add your own response after upload.'
               };
 
           setQuizQuestions([generatedQuestion]);
@@ -197,7 +197,7 @@ export default function Quiz() {
       <div className="quiz-panel">
         <div className="panel-header">
           <h2 className="panel-title">📝 Modular Study Cabin Quiz</h2>
-          <p className="panel-subtitle">Upload your own file to build a quiz. No sample bank is bundled here.</p>
+          <p className="panel-subtitle">Upload your own file to build a quiz from your content.</p>
         </div>
 
         {generating ? (
@@ -445,10 +445,16 @@ export default function Quiz() {
                         <blockquote className="subjective-user-quote handwritten text-sm">
                           "{record.subjectiveAnswer || 'No response logged'}"
                         </blockquote>
-                        <p className="text-xs font-bold mt-2">Cabin Sample Answer:</p>
-                        <blockquote className="subjective-sample-quote text-sm text-gray-700">
-                          "{q.sampleAnswer}"
-                        </blockquote>
+                        {q.sampleAnswer ? (
+                          <>
+                            <p className="text-xs font-bold mt-2">Reference Answer:</p>
+                            <blockquote className="subjective-sample-quote text-sm text-gray-700">
+                              "{q.sampleAnswer}"
+                            </blockquote>
+                          </>
+                        ) : (
+                          <p className="text-xs text-gray-500 mt-2">No reference answer added yet.</p>
+                        )}
                         <p className="text-xs mt-2">
                           <span className="font-bold">Self-Grade Evaluation:</span>{' '}
                           <span className={`badge-small font-bold ${
@@ -590,7 +596,7 @@ export default function Quiz() {
               <div className="subjective-reveal-box sketch-border-sm mt-3">
                 <div className="rubric-header border-bottom pb-2">
                   <h4 className="font-bold text-sm">🔍 Cabin Rubric Assessment</h4>
-                  <p className="text-xxs text-gray-500">Compare your response against the cabinet sample answer and self-evaluate.</p>
+                  <p className="text-xxs text-gray-500">Compare your response against your own notes and self-evaluate.</p>
                 </div>
                 
                 <div className="rubric-comparison-grid mt-3">
@@ -601,7 +607,7 @@ export default function Quiz() {
                     </blockquote>
                   </div>
                   <div className="rubric-column">
-                    <span className="handwritten text-xs font-bold">Sample Key Solutions:</span>
+                    <span className="handwritten text-xs font-bold">Reference Notes:</span>
                     <blockquote className="sample-response-quote font-sans text-xs mt-1">
                       "{q?.sampleAnswer}"
                     </blockquote>

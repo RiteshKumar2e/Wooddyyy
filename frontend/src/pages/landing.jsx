@@ -134,16 +134,16 @@ export default function Landing() {
               {/* Books on the shelf */}
               <div className="shelf-books">
                 <div className="book book-1 sketch-border-sm" title="Study planner notebook">
-                  <span className="book-spine">BIO</span>
+                  <span className="book-spine">TASK</span>
                 </div>
                 <div className="book book-2 sketch-border-sm" title="Quiz compiler">
-                  <span className="book-spine">MATH</span>
+                  <span className="book-spine">PLAN</span>
                 </div>
                 <div className="book book-3 sketch-border-sm" title="Revision notes">
-                  <span className="book-spine">CHEM</span>
+                  <span className="book-spine">QUIZ</span>
                 </div>
                 <div className="book book-4 sketch-border-sm" title="Growth records">
-                  <span className="book-spine">HIST</span>
+                  <span className="book-spine">NOTE</span>
                 </div>
               </div>
 
@@ -444,7 +444,7 @@ export default function Landing() {
       <section className="testimonials-section" id="about">
         <div className="section-header">
           <span className="handwritten" style={{ fontSize: '32px' }}>What students are crafting...</span>
-          <h2 className="section-title">Word from Pinned Desks</h2>
+          <h2 className="section-title">What the Cabin Gives You</h2>
         </div>
 
         <div className="testimonials-corkboard sketch-border">
@@ -461,9 +461,9 @@ export default function Landing() {
               </svg>
             </div>
               <p className="testimonial-text">
-              "Building study plan roadmaps here feels like organizing my desk drawer. It is so visual, slow, and therapeutic."
+              Start with one subject, add chapters as you go, and keep the plan uncluttered.
             </p>
-            <h4 className="student-name handwritten">- Woody, Biology Student</h4>
+            <h4 className="student-name handwritten">Study Plan</h4>
           </div>
 
           {/* Testimonial Polaroid 2 */}
@@ -476,9 +476,9 @@ export default function Landing() {
               </svg>
             </div>
             <p className="testimonial-text">
-              "The tactile paper trials quizzes are so peaceful. No game timers flashing red or screeching points. Just peaceful learning at my own page rhythm."
+              Upload your own notes or syllabus and build a quiz from your material.
             </p>
-            <h4 className="student-name handwritten">- Kiara M., Prep Student</h4>
+            <h4 className="student-name handwritten">Quiz Builder</h4>
           </div>
 
           {/* Testimonial Polaroid 3 */}
@@ -491,9 +491,9 @@ export default function Landing() {
               </svg>
             </div>
             <p className="testimonial-text">
-              "Having the hourglass blocks instead of harsh alarms is a complete mindset shift. I set my timetable, flip the sand glass, and sink into my chemistry books."
+              Set your own blocks, breaks, and review windows without any preset routine.
             </p>
-            <h4 className="student-name handwritten">- Dev K., MCAT Candidate</h4>
+            <h4 className="student-name handwritten">Timetable</h4>
           </div>
         </div>
       </section>
