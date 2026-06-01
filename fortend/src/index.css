@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&family=Caveat:wght@400..700&display=swap');
+
+:root {
+  /* Cozy Yellowish & Warm Organic Palette */
+  --wood-bg: #FCFAF2;          /* Recycled butter paper cream */
+  --wood-card: #FFFDF9;        /* Milk buttercream white */
+  --wood-accent: #FDF2CC;      /* Soft highlighter yellow */
+  --wood-primary: #E6A817;     /* Warm honey gold */
+  --wood-primary-hover: #C58F10;
+  --wood-ink: #2D2C24;         /* Cozy soft organic ink (not harsh black) */
+  --wood-ink-muted: #726E58;   /* Muted warm ink for subtitles */
+  --wood-border: #2D2C24;      /* Strong ink outline for hand-drawn look */
+  --wood-border-light: #DDD9C5;/* Light pencil grid lines */
+  --wood-sage: #E8F3D6;        /* Light sage green for subject cards */
+  --wood-clay: #F7E7D9;        /* Warm peach-terracotta for quiz cards */
+  --wood-sky: #E3F2FD;         /* Light blue for timetable elements */
+  
+  /* Handwritten post-it notes */
+  --note-yellow: #FFF9C4;
+  --note-pink: #FCE4EC;
+  --note-green: #E8F5E9;
+  
+  /* Tactile Sketch Shadows */
+  --wood-shadow: 4px 4px 0px var(--wood-ink);
+  --wood-shadow-hover: 7px 7px 0px var(--wood-ink);
+  --wood-shadow-sm: 2px 2px 0px var(--wood-ink);
+  
+  /* Fonts */
+  --sans: 'Quicksand', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --heading: 'Fredoka', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --handwritten: 'Caveat', cursive, sans-serif;
+
+  font: 17px/150% var(--sans);
+  letter-spacing: 0.2px;
+  color: var(--wood-ink);
+  background: var(--wood-bg);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--wood-bg);
+  /* Light paper grain texture simulation */
+  background-image: radial-gradient(var(--wood-border-light) 0.5px, transparent 0.5px), 
+                    radial-gradient(var(--wood-border-light) 0.5px, var(--wood-bg) 0.5px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Beautiful Rounded Headers */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--wood-ink);
+  line-height: 120%;
+}
+
+h1 {
+  font-size: 48px;
+  letter-spacing: -0.5px;
+  @media (max-width: 768px) {
+    font-size: 36px;
+  }
+}
+
+h2 {
+  font-size: 32px;
+  letter-spacing: -0.2px;
+  @media (max-width: 768px) {
+    font-size: 26px;
+  }
+}
+
+h3 {
+  font-size: 22px;
+}
+
+p {
+  font-family: var(--sans);
+  font-weight: 500;
+  color: var(--wood-ink-muted);
+  line-height: 160%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Human-Made Sketch Border & Outline Utility */
+.sketch-border {
+  border: 2.5px solid var(--wood-ink) !important;
+  /* Slightly irregular borders to make them look hand-sketched */
+  border-radius: 255px 25px 225px 25px/25px 225px 25px 255px !important;
+}
+
+.sketch-border-sm {
+  border: 2px solid var(--wood-ink) !important;
+  border-radius: 120px 10px 95px 12px/12px 95px 10px 120px !important;
+}
+
+.sketch-shadow {
+  box-shadow: var(--wood-shadow);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sketch-shadow:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--wood-shadow-hover);
+}
+
+.sketch-shadow:active {
+  transform: translate(1px, 1px);
+  box-shadow: var(--wood-shadow-sm);
+}
+
+/* Handwriting Accent */
+.handwritten {
+  font-family: var(--handwritten);
+  font-size: 26px;
+  color: var(--wood-primary);
+  display: inline-block;
+  transform: rotate(-3deg);
+  line-height: 1;
+}
+
+/* Button UI */
+.btn-sketch {
+  font-family: var(--heading);
+  font-weight: 600;
+  font-size: 16px;
+  padding: 10px 24px;
+  background-color: var(--wood-card);
+  color: var(--wood-ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-sketch-primary {
+  background-color: var(--wood-primary);
+}
+
+.btn-sketch-primary:hover {
+  background-color: var(--wood-primary-hover);
+}
+
+/* Notebook Pinned Notes */
+.post-it {
+  background-color: var(--note-yellow);
+  padding: 20px;
+  box-shadow: var(--wood-shadow-sm);
+  position: relative;
+  transform: rotate(-1.5deg);
+  transition: all 0.2s ease-in-out;
+}
+
+.post-it:hover {
+  transform: rotate(0deg) scale(1.03);
+}
+
+.post-it::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 22px;
+  background-color: rgba(253, 242, 204, 0.7); /* translucent tape */
+  border: 1px dashed rgba(45, 44, 36, 0.2);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--wood-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--wood-border-light);
+  border: 2px solid var(--wood-bg);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--wood-ink-muted);
+}
