@@ -83,7 +83,7 @@ export default function RegisterPage() {
                 className="form-input sketch-border-sm"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Mansi Sharma"
+                placeholder="Woody Sharma"
                 required
               />
             </div>

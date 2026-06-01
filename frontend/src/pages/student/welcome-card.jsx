@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function WelcomeCard({ userName = 'Mansi' }) {
+export default function WelcomeCard({ userName = '' }) {
   const [mood, setMood] = useState('focused'); // calm, focused, tired, inspired
   const [timeString, setTimeString] = useState('');
 
@@ -28,7 +28,9 @@ export default function WelcomeCard({ userName = 'Mansi' }) {
 
       <div className="welcome-layout">
         <div className="welcome-main-col">
-          <h2 className="welcome-greet">Welcome back to your cabin, {userName}! ☕</h2>
+          <h2 className="welcome-greet">
+            {userName ? `Welcome back to your cabin, ${userName}! ☕` : 'Welcome back to your cabin ☕'}
+          </h2>
           <p className="welcome-time-text font-mono">
             Desk Time: <span className="highlight-text">{timeString}</span>
           </p>

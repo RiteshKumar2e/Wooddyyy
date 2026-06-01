@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 
-export default function Profile() {
-  const [profile, setProfile] = useState({
-    fullName: 'Mansi',
-    email: 'guest@mansi.com',
-    phone: '',
-    goal: 'Stay consistent with study blocks',
-    timezone: 'IST',
-  });
+const fallbackProfile = {
+  fullName: '',
+  email: '',
+  phone: '',
+  goal: '',
+  timezone: '',
+};
+
+export default function Profile({ profile: profileProp, onSave }) {
+  const [profile, setProfile] = useState(profileProp || fallbackProfile);
   const [saved, setSaved] = useState(false);
+
+  React.useEffect(() => {
+    setProfile(profileProp || fallbackProfile);
+  }, [profileProp]);
 
   const handleChange = (field) => (e) => {
     setSaved(false);
@@ -18,6 +24,9 @@ export default function Profile() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSaved(true);
+    if (onSave) {
+      onSave(profile);
+    }
   };
 
   return (
@@ -29,10 +38,10 @@ export default function Profile() {
 
       <div className="profile-layout sketch-border sketch-shadow">
         <div className="profile-card-preview sketch-border-sm">
-          <div className="profile-avatar">M</div>
-          <h3 className="profile-name">{profile.fullName || 'Mansi'}</h3>
-          <p className="profile-mail">{profile.email || 'guest@mansi.com'}</p>
-          <div className="profile-badge">{profile.timezone}</div>
+          <div className="profile-avatar">{profile.fullName ? profile.fullName.trim().charAt(0).toUpperCase() : '—'}</div>
+          <h3 className="profile-name">{profile.fullName || 'Your name here'}</h3>
+          <p className="profile-mail">{profile.email || 'Add your email in the form'}</p>
+          <div className="profile-badge">{profile.timezone || 'Timezone'}</div>
         </div>
 
         <form className="profile-form" onSubmit={handleSubmit}>
@@ -56,6 +65,7 @@ export default function Profile() {
                 value={profile.timezone}
                 onChange={handleChange('timezone')}
               >
+                <option value="" disabled>Select timezone</option>
                 <option value="IST">IST</option>
                 <option value="UTC">UTC</option>
                 <option value="GMT">GMT</option>

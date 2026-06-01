@@ -1,52 +1,33 @@
 import React, { useState } from 'react';
 
-const strategies = [
-  {
-    id: 1, subject: 'Biology', examDate: '2024-06-15', daysLeft: 14,
-    phases: [
-      { phase: 'Recall', weeks: 'Week 1', tasks: ['Re-read all chapter summaries', 'Fill blank diagrams from memory', 'Complete 30 flashcard reviews daily'], done: true },
-      { phase: 'Practice', weeks: 'Week 2', tasks: ['Attempt 2 past paper questions per day', 'Identify weak topics from wrong answers', 'Revise weak chapters with notes'], done: false },
-      { phase: 'Simulate', weeks: 'Week 3', tasks: ['Full mock exam under timed conditions', 'Mark your own paper honestly', 'Final revision of must-revise cards'], done: false },
-    ],
-    tips: ['Focus on diagrams — labelling is often tested.', 'Understand processes — don\'t memorise blindly.', 'Ecology and Genetics carry high marks.'],
-    color: 'var(--wood-sage)',
-  },
-  {
-    id: 2, subject: 'Chemistry', examDate: '2024-06-18', daysLeft: 17,
-    phases: [
-      { phase: 'Formula Bank', weeks: 'Week 1', tasks: ['Write all formulas from memory each morning', 'Categorise organic reaction types', 'Understand mole calculations deeply'], done: true },
-      { phase: 'Problems', weeks: 'Week 2', tasks: ['Solve 10 numerical problems daily', 'Complete titration & electrolysis problems', 'Peer-explain one concept per day'], done: false },
-      { phase: 'Mock', weeks: 'Week 3', tasks: ['Full chemistry mock', 'Review calculation errors carefully', 'Rest 1 day before exam'], done: false },
-    ],
-    tips: ['Balance equations before calculating anything.', 'Draw the electron arrangement for bonding questions.', 'Check units in every numerical answer.'],
-    color: 'var(--wood-accent)',
-  },
-];
+const strategies = [];
 
 export default function ExamPrepStrat() {
-  const [activeStrat, setActiveStrat] = useState(1);
-  const [phasesDone, setPhasesDone] = useState({ 1: [true, false, false], 2: [true, false, false] });
+  const [activeStrat, setActiveStrat] = useState(null);
+  const [phasesDone, setPhasesDone] = useState({});
 
   const strat = strategies.find(s => s.id === activeStrat);
-  const done = phasesDone[activeStrat] || [false, false, false];
+  const done = phasesDone[activeStrat] || [];
 
   const togglePhase = (idx) => {
     const updated = done.map((d, i) => i === idx ? !d : d);
     setPhasesDone({ ...phasesDone, [activeStrat]: updated });
   };
 
-  const overallProgress = Math.round((done.filter(Boolean).length / done.length) * 100);
+  const overallProgress = done.length ? Math.round((done.filter(Boolean).length / done.length) * 100) : 0;
 
   return (
     <div className="exam-prep-panel">
       <div className="panel-header">
         <h2 className="panel-title">🏆 Exam Preparation Strategy</h2>
-        <p className="panel-subtitle">Your personalised 3-phase exam roadmap. Tick off phases as you complete them.</p>
+        <p className="panel-subtitle">Build your own exam roadmap from scratch.</p>
       </div>
 
       {/* Subject Tab Selector */}
       <div className="strat-tabs">
-        {strategies.map(s => (
+        {strategies.length === 0 ? (
+          <div className="exam-empty sketch-border-sm">No exam strategy added yet.</div>
+        ) : strategies.map(s => (
           <button key={s.id} onClick={() => setActiveStrat(s.id)}
             className={`strat-tab sketch-border sketch-shadow ${activeStrat === s.id ? 'strat-tab-active' : ''}`}
             style={{ '--stab-color': s.color }}>
@@ -68,7 +49,7 @@ export default function ExamPrepStrat() {
 
       {/* Phase Roadmap Cards */}
       <div className="phases-timeline">
-        {strat.phases.map((p, idx) => (
+        {strat?.phases?.length ? strat.phases.map((p, idx) => (
           <div key={idx} className={`phase-card sketch-border sketch-shadow ${done[idx] ? 'phase-done' : ''}`}>
             {/* Connector line */}
             {idx < strat.phases.length - 1 && <div className="timeline-connector"></div>}
@@ -96,19 +77,19 @@ export default function ExamPrepStrat() {
               ))}
             </ul>
           </div>
-        ))}
+        )) : <div className="exam-empty sketch-border-sm">Select or add a strategy to see phases.</div>}
       </div>
 
       {/* Cozy Exam Tips Post-It */}
       <div className="exam-tips-section">
-        <h3 className="card-section-title">📌 Cozy Expert Tips for {strat.subject}</h3>
+        <h3 className="card-section-title">📌 Cozy Expert Tips{strat ? ` for ${strat.subject}` : ''}</h3>
         <div className="tips-grid">
-          {strat.tips.map((tip, i) => (
+          {strat?.tips?.length ? strat.tips.map((tip, i) => (
             <div key={i} className="tip-post-it sketch-border-sm" style={{ transform: `rotate(${i % 2 === 0 ? '-1.5' : '1'}deg)` }}>
               <span className="tip-pin">📌</span>
               <p className="tip-text">{tip}</p>
             </div>
-          ))}
+          )) : <div className="exam-empty sketch-border-sm">Add your own tips to see them here.</div>}
         </div>
       </div>
 

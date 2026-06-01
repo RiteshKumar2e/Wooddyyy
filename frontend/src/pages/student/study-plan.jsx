@@ -1,43 +1,15 @@
 import React, { useState } from 'react';
 
-const initialSubjects = [
-  {
-    id: 1, name: 'Biology', color: 'var(--wood-sage)', progress: 60,
-    chapters: [
-      { id: 1, title: 'Cell Biology', done: true, notes: 'Mitosis & Meiosis covered', date: '2026-06-01', time: '09:00 AM - 10:30 AM' },
-      { id: 2, title: 'Genetics & DNA', done: true, notes: 'Mendelian ratios revised', date: '2026-06-02', time: '11:00 AM - 12:30 PM' },
-      { id: 3, title: 'Ecology & Biomes', done: false, notes: 'Revise trophic levels', date: '2026-06-03', time: '02:00 PM - 03:30 PM' },
-      { id: 4, title: 'Human Physiology', done: false, notes: '', date: '2026-06-04', time: '04:00 PM - 05:30 PM' },
-    ]
-  },
-  {
-    id: 2, name: 'Mathematics', color: 'var(--wood-accent)', progress: 40,
-    chapters: [
-      { id: 1, title: 'Calculus Integrals', done: true, notes: 'Done integration by parts', date: '2026-06-01', time: '08:00 AM - 10:00 AM' },
-      { id: 2, title: 'Matrices & Determinants', done: false, notes: 'Formulas and properties', date: '2026-06-03', time: '10:00 AM - 12:00 PM' },
-      { id: 3, title: 'Probability & Stats', done: false, notes: '', date: '2026-06-05', time: '01:00 PM - 03:00 PM' },
-      { id: 4, title: 'Trigonometry', done: false, notes: '', date: '2026-06-07', time: '03:00 PM - 05:00 PM' },
-    ]
-  },
-  {
-    id: 3, name: 'Chemistry', color: 'var(--wood-clay)', progress: 75,
-    chapters: [
-      { id: 1, title: 'Organic Reactions', done: true, notes: 'SN1 SN2 mechanisms covered', date: '2026-05-30', time: '09:30 AM - 11:30 AM' },
-      { id: 2, title: 'Atomic Structure', done: true, notes: 'Bohr model revised', date: '2026-06-01', time: '11:30 AM - 01:30 PM' },
-      { id: 3, title: 'Periodic Table Trends', done: true, notes: 'Electronegativity patterns', date: '2026-06-02', time: '02:30 PM - 04:30 PM' },
-      { id: 4, title: 'Electrochemistry', done: false, notes: '', date: '2026-06-04', time: '05:00 PM - 07:00 PM' },
-    ]
-  },
-];
+const initialSubjects = [];
 
 export default function StudyPlan() {
   const [subjects, setSubjects] = useState(initialSubjects);
-  const [activeSubject, setActiveSubject] = useState(1);
+  const [activeSubject, setActiveSubject] = useState(null);
   const [newChapterTitle, setNewChapterTitle] = useState('');
   
   // Custom inputs for date and time
-  const [newChapterDate, setNewChapterDate] = useState('2026-06-05');
-  const [newChapterTime, setNewChapterTime] = useState('10:00 AM - 12:00 PM');
+  const [newChapterDate, setNewChapterDate] = useState('');
+  const [newChapterTime, setNewChapterTime] = useState('');
   const [newChapterNotes, setNewChapterNotes] = useState('');
 
   // Syllabus upload states
@@ -90,30 +62,13 @@ export default function StudyPlan() {
     if (!file) return;
     setFileName(file.name);
     setUploading(true);
-    setUploadStatus('Carving syllabus lines... 📖');
+    setUploadStatus('Reading your syllabus... 📖');
 
     setTimeout(() => {
-      setUploadStatus('Mapping syllabus milestones into calendar dates... 🕰️');
+      setUploadStatus('Preparing your study branches... 🕰️');
       setTimeout(() => {
-        setUploadStatus('Populating cabin dashboard study branches... 🌲');
+        setUploadStatus('Ready to add your own branches. 🌲');
         setTimeout(() => {
-          // Append 3 generated topics for the active subject
-          const generatedTopics = [
-            { id: Date.now() + 1, title: 'Syllabus Topic A: Advanced Overview', done: false, notes: 'Auto-carved from syllabus', date: '2026-06-08', time: '10:00 AM - 11:30 AM' },
-            { id: Date.now() + 2, title: 'Syllabus Topic B: Deep Core Concepts', done: false, notes: 'Auto-carved from syllabus', date: '2026-06-09', time: '01:00 PM - 02:30 PM' },
-            { id: Date.now() + 3, title: 'Syllabus Topic C: Mastery & Application', done: false, notes: 'Auto-carved from syllabus', date: '2026-06-10', time: '03:30 PM - 05:00 PM' }
-          ];
-
-          setSubjects(subjects.map(s => {
-            if (s.id === activeSubject) {
-              const updatedChapters = [...s.chapters, ...generatedTopics];
-              const doneCount = updatedChapters.filter(c => c.done).length;
-              const newProgress = Math.round((doneCount / updatedChapters.length) * 100);
-              return { ...s, chapters: updatedChapters, progress: newProgress };
-            }
-            return s;
-          }));
-
           setUploading(false);
           setUploadStatus('');
           setFileName('');
@@ -126,7 +81,7 @@ export default function StudyPlan() {
     <div className="study-plan-panel">
       <div className="panel-header">
         <h2 className="panel-title">🗺️ Study Plan Branches</h2>
-        <p className="panel-subtitle">Carve your syllabus into digestible chapters, allocate target dates, and map times.</p>
+        <p className="panel-subtitle">Add your own subjects and chapters to begin planning.</p>
       </div>
 
       {/* Syllabus Upload Block */}
@@ -135,7 +90,7 @@ export default function StudyPlan() {
           <span className="upload-icon">📂</span>
           <div className="upload-text-block">
             <h3 className="font-bold text-base">Autopilot Syllabus Planner</h3>
-            <p className="text-xs text-gray-500">Upload your syllabus PDF/Image. The cabin wizard will map dates, times, and generate study branches automatically!</p>
+            <p className="text-xs text-gray-500">Upload your own syllabus PDF/Image to prepare study branches.</p>
           </div>
         </div>
 
@@ -159,7 +114,9 @@ export default function StudyPlan() {
       <div className="sp-layout">
         {/* Subject Tabs */}
         <div className="sp-subject-sidebar">
-          {subjects.map(s => (
+          {subjects.length === 0 ? (
+            <div className="sp-empty sketch-border-sm">No subjects added yet.</div>
+          ) : subjects.map(s => (
             <button key={s.id} onClick={() => setActiveSubject(s.id)}
               className={`sp-subject-tab sketch-border-sm ${activeSubject === s.id ? 'active-tab' : ''}`}
               style={{ '--tab-color': s.color }}>
@@ -175,15 +132,15 @@ export default function StudyPlan() {
         {/* Chapter List */}
         <div className="sp-chapter-col sketch-border sketch-shadow">
           <div className="sp-chapter-header" style={{ borderBottom: `3px solid ${active?.color}` }}>
-            <h3 className="font-bold text-xl">{active?.name} — Scheduled Branches</h3>
+            <h3 className="font-bold text-xl">{active?.name ? `${active.name} — Scheduled Branches` : 'Scheduled Branches'}</h3>
             <div className="sp-overall-bar sketch-border-sm">
               <div className="sp-overall-fill" style={{ width: `${active?.progress}%`, background: active?.color }}></div>
             </div>
-            <p className="text-xs text-gray-500">{active?.progress}% of study branches harvested</p>
+            <p className="text-xs text-gray-500">{active ? `${active.progress}% of study branches harvested` : 'No branches yet.'}</p>
           </div>
 
           <ul className="chapter-list">
-            {active?.chapters.map((ch) => (
+            {active?.chapters?.length ? active.chapters.map((ch) => (
               <li key={ch.id} className={`chapter-item sketch-border-sm ${ch.done ? 'chapter-done' : ''}`} onClick={() => toggleChapter(ch.id)}>
                 <div className="chapter-check sketch-border-sm">
                   {ch.done && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#2D2C24" strokeWidth="2.5" strokeLinecap="round" /></svg>}
@@ -200,7 +157,7 @@ export default function StudyPlan() {
                 </div>
                 <span className="chapter-status">{ch.done ? '✅' : '○'}</span>
               </li>
-            ))}
+            )) : <li className="chapter-empty sketch-border-sm">Add a subject to start planning chapters.</li>}
           </ul>
 
           {/* Add Chapter Form */}
@@ -210,7 +167,7 @@ export default function StudyPlan() {
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Branch Title *</label>
                 <input value={newChapterTitle} onChange={e => setNewChapterTitle(e.target.value)}
-                  placeholder="e.g. Thermodynamics basics" className="form-input sketch-border-sm" required />
+                  placeholder="Enter a branch title" className="form-input sketch-border-sm" required />
               </div>
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Target Date</label>
@@ -220,15 +177,15 @@ export default function StudyPlan() {
               <div className="form-group-sm">
                 <label className="text-xxs font-bold">Study Time slot</label>
                 <input value={newChapterTime} onChange={e => setNewChapterTime(e.target.value)}
-                  placeholder="e.g. 10:00 AM - 12:00 PM" className="form-input sketch-border-sm" />
+                  placeholder="Add a study window" className="form-input sketch-border-sm" />
               </div>
               <div className="form-group-sm full-width">
                 <label className="text-xxs font-bold">Quick Memo</label>
                 <input value={newChapterNotes} onChange={e => setNewChapterNotes(e.target.value)}
-                  placeholder="e.g. Focus on past formulas" className="form-input sketch-border-sm" />
+                  placeholder="Add a short note or reminder" className="form-input sketch-border-sm" />
               </div>
             </div>
-            <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow mt-3 w-full justify-center">
+            <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow mt-3 w-full justify-center study-plan-submit-btn">
               + Plant Study Branch
             </button>
           </form>
@@ -273,6 +230,7 @@ export default function StudyPlan() {
         .sp-subject-tab { background: var(--wood-card); border: 2px solid var(--wood-ink); padding: 14px 16px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s; }
         .sp-subject-tab:hover { transform: translateX(3px); }
         .sp-subject-tab.active-tab { background: var(--tab-color, var(--wood-accent)); box-shadow: 3px 3px 0 var(--wood-ink); }
+        .sp-empty, .chapter-empty { background: var(--wood-card); padding: 14px; color: var(--wood-ink-muted); }
         
         .subject-name { font-family: var(--heading); font-weight: 700; font-size: 15px; }
         .subject-mini-progress { height: 6px; background: rgba(45,44,36,0.1); border: 1px solid var(--wood-ink); border-radius: 3px; overflow: hidden; }
@@ -304,6 +262,35 @@ export default function StudyPlan() {
         .form-group-sm { display: flex; flex-direction: column; gap: 4px; }
         .full-width { grid-column: span 3; }
         @media (max-width: 600px) { .full-width { grid-column: span 1; } }
+
+        .add-chapter-form-expanded .form-input {
+          background: var(--wood-card);
+          min-height: 44px;
+          padding: 10px 12px;
+          font-size: 14px;
+          border: 2px solid var(--wood-ink);
+          color: var(--wood-ink);
+        }
+
+        .add-chapter-form-expanded .form-input::placeholder {
+          color: var(--wood-ink-muted);
+          opacity: 0.75;
+        }
+
+        .add-chapter-form-expanded .form-input:focus {
+          background: #FFFDF0;
+          border-color: var(--wood-primary) !important;
+          box-shadow: 0 0 0 3px rgba(230, 168, 23, 0.12);
+        }
+
+        .study-plan-submit-btn {
+          min-height: 48px;
+          letter-spacing: -0.2px;
+        }
+
+        .study-plan-submit-btn:hover {
+          transform: translateY(-1px);
+        }
         
         .color-primary { color: var(--wood-primary-hover); }
       `}</style>

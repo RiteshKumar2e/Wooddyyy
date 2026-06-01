@@ -1,47 +1,11 @@
 import React from 'react';
 
-const stats = [
-  { label: 'Total Subjects', value: '6', icon: '📚', color: 'var(--wood-accent)', change: 'Active branches' },
-  { label: 'Ongoing Modules', value: '8', icon: '🔄', color: 'var(--wood-clay)', change: 'In progress' },
-  { label: 'Completed Modules', value: '12', icon: '✅', color: 'var(--wood-sage)', change: '+3 this week' },
-  { label: 'Topics Covered', value: '47', icon: '📖', color: 'var(--wood-sky)', change: '+5 this week' },
-  { label: 'Quizzes Done', value: '23', icon: '📝', color: '#F3E5F5', change: '+3 this week' },
-  { label: 'Study Hours', value: '38h', icon: '⏳', color: '#E8F3D6', change: '+2.5h this week' },
-];
-
-const subjectStatusData = [
-  {
-    subject: 'Biology 🧬',
-    color: 'var(--wood-sage)',
-    ongoing: ['Genetics & DNA', 'Ecology & Biomes'],
-    completed: ['Cell Biology', 'Human Physiology']
-  },
-  {
-    subject: 'Chemistry 🧪',
-    color: 'var(--wood-clay)',
-    ongoing: ['Electrochemistry'],
-    completed: ['Organic Reactions', 'Atomic Structure', 'Periodic Table Trends']
-  },
-  {
-    subject: 'Mathematics 📐',
-    color: 'var(--wood-accent)',
-    ongoing: ['Matrices & Determinants', 'Probability & Stats'],
-    completed: ['Calculus Integrals']
-  }
-];
-
-const recentActivity = [
-  { time: '2h ago', action: 'Completed Quiz: Cell Biology Ch. 3', type: 'quiz' },
-  { time: '5h ago', action: 'Added 12 revision notes for Organic Chemistry', type: 'revision' },
-  { time: 'Yesterday', action: 'Updated Study Plan: Physics Thermodynamics', type: 'plan' },
-  { time: '2 days ago', action: 'Completed Exam Prep Strategy for Biology', type: 'exam' },
-  { time: '3 days ago', action: 'Logged 4h focus block in Timetable', type: 'time' },
-];
-
-const typeColor = { quiz: 'var(--wood-clay)', revision: 'var(--wood-sage)', plan: 'var(--wood-accent)', exam: 'var(--wood-sky)', time: '#F3E5F5' };
-const typeIcon = { quiz: '📝', revision: '🔁', plan: '🗺️', exam: '🏆', time: '⏰' };
-
-const weekHeat = [3, 5, 2, 6, 4, 1, 5];
+const stats = [];
+const subjectStatusData = [];
+const recentActivity = [];
+const typeColor = {};
+const typeIcon = {};
+const weekHeat = [];
 const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 export default function Summary() {
@@ -58,24 +22,23 @@ export default function Summary() {
           <div className="streak-flame-wrapper">
             <span className="flame-large">🔥</span>
             <div className="streak-count-box">
-              <span className="streak-num">5</span>
+              <span className="streak-num">0</span>
               <span className="streak-days-label">day streak</span>
             </div>
           </div>
           
           <div className="streak-details">
-            <h3 className="font-bold text-base">Cabin Focus Candle is Lit! 🕯️</h3>
-            <p className="text-xs text-gray-500">You are doing fantastic. Settle into your quiet study environment and maintain your daily rhythm today!</p>
+            <h3 className="font-bold text-base">No active streak yet</h3>
+            <p className="text-xs text-gray-500">Start using the workspace to build a progress streak.</p>
             
             {/* Week Check-offs */}
             <div className="week-checks-row mt-3">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => {
-                const isCompleted = idx < 5; // Mon to Fri done
                 return (
                   <div key={day} className="day-check-item">
                     <span className="day-check-label text-xxs font-bold">{day}</span>
-                    <div className={`day-check-dot sketch-border-sm ${isCompleted ? 'checked' : ''}`}>
-                      {isCompleted ? '✓' : ''}
+                    <div className="day-check-dot sketch-border-sm">
+                      
                     </div>
                   </div>
                 );
@@ -87,6 +50,11 @@ export default function Summary() {
 
       {/* Stats Row */}
       <div className="stats-row">
+        {stats.length === 0 && (
+          <div className="empty-summary-card sketch-border-sm">
+            No summary data yet. Add study activity to populate this dashboard.
+          </div>
+        )}
         {stats.map((s, i) => (
           <div key={i} className="stat-card sketch-border sketch-shadow" style={{ '--card-color': s.color }}>
             <div className="stat-icon-bg" style={{ backgroundColor: s.color }}>
@@ -104,37 +72,17 @@ export default function Summary() {
       {/* In which subject what is ongoing vs completed */}
       <div className="subject-milestones-card sketch-border sketch-shadow">
         <h3 className="card-section-title">📂 Subject Milestones (Ongoing vs Completed)</h3>
-        <p className="text-xs text-gray-500 mb-4">Track which chapters are currently open on your study desk vs those completely locked in.</p>
-        
-        <div className="subject-milestones-grid">
-          {subjectStatusData.map((data) => (
-            <div key={data.subject} className="subject-milestone-column sketch-border-sm" style={{ borderTop: `4px solid ${data.color}` }}>
-              <h4 className="font-bold text-sm mb-3 text-center">{data.subject}</h4>
-              
-              <div className="milestone-block bg-yellow-soft sketch-border-sm">
-                <span className="milestone-badge bg-orange">🔄 Ongoing</span>
-                <ul className="milestone-list text-xs">
-                  {data.ongoing.map((item) => <li key={item}>✏️ {item}</li>)}
-                  {data.ongoing.length === 0 && <li className="text-gray-400 italic">No active topics</li>}
-                </ul>
-              </div>
-
-              <div className="milestone-block bg-sage-soft sketch-border-sm mt-3">
-                <span className="milestone-badge bg-green">✅ Completed</span>
-                <ul className="milestone-list text-xs">
-                  {data.completed.map((item) => <li key={item}>🌿 {item}</li>)}
-                  {data.completed.length === 0 && <li className="text-gray-400 italic">No completed topics</li>}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
+        <p className="text-xs text-gray-500 mb-4">No subject data yet. Add chapters in Study Plan to see milestones here.</p>
+        <div className="empty-summary-card sketch-border-sm">Subject milestones will appear after you add study topics.</div>
       </div>
 
       <div className="summary-bottom-grid">
         {/* Weekly Activity Heatmap */}
         <div className="heatmap-card sketch-border sketch-shadow">
           <h3 className="card-section-title">This Week's Focus Heat</h3>
+          {weekHeat.length === 0 ? (
+            <div className="empty-summary-card sketch-border-sm">No weekly activity yet.</div>
+          ) : (
           <div className="heatmap-row">
             {weekHeat.map((val, i) => (
               <div key={i} className="heatmap-col">
@@ -147,6 +95,7 @@ export default function Summary() {
               </div>
             ))}
           </div>
+          )}
           <div className="heatmap-legend">
             <span className="legend-dot" style={{ background: '#F5F0E0' }}></span> Low
             <span className="legend-dot ml-2" style={{ background: '#FDF2CC' }}></span> Mid
@@ -157,6 +106,9 @@ export default function Summary() {
         {/* Recent Activity Feed */}
         <div className="activity-card sketch-border sketch-shadow">
           <h3 className="card-section-title">Recent Desk Activity</h3>
+          {recentActivity.length === 0 ? (
+            <div className="empty-summary-card sketch-border-sm">Nothing logged yet.</div>
+          ) : (
           <ul className="activity-list">
             {recentActivity.map((a, i) => (
               <li key={i} className="activity-item sketch-border-sm" style={{ borderLeft: `4px solid ${typeColor[a.type]}` }}>
@@ -168,6 +120,7 @@ export default function Summary() {
               </li>
             ))}
           </ul>
+          )}
         </div>
       </div>
 
@@ -195,6 +148,7 @@ export default function Summary() {
         .day-check-dot.checked { background: var(--wood-primary); color: var(--wood-ink); }
 
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; }
+        .empty-summary-card { background: var(--wood-bg); padding: 18px; font-size: 14px; color: var(--wood-ink-muted); }
         .stat-card { background: var(--wood-card); padding: 20px; display: flex; align-items: center; gap: 16px; }
         .stat-icon-bg { width: 54px; height: 54px; border: 2px solid var(--wood-ink); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .stat-value { font-family: var(--heading); font-size: 28px; font-weight: 700; line-height: 1; }

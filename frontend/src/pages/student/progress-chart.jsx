@@ -1,67 +1,6 @@
 import React, { useState } from 'react';
 
-const subjectData = [
-  { 
-    name: 'Biology', 
-    completed: 3, 
-    total: 5, 
-    quizAvg: 78, 
-    color: '#88C088', 
-    sessions: [3, 5, 2, 4, 6, 3, 5],
-    chapters: [
-      { title: 'Cell Biology', done: true },
-      { title: 'Genetics & DNA', done: true },
-      { title: 'Ecology & Biomes', done: false },
-      { title: 'Human Physiology', done: true },
-      { title: 'Plant Anatomy', done: false }
-    ]
-  },
-  { 
-    name: 'Chemistry', 
-    completed: 4, 
-    total: 6, 
-    quizAvg: 84, 
-    color: '#E6A817', 
-    sessions: [4, 3, 5, 6, 4, 2, 6],
-    chapters: [
-      { title: 'Organic Reactions', done: true },
-      { title: 'Atomic Structure', done: true },
-      { title: 'Periodic Table Trends', done: true },
-      { title: 'Electrochemistry', done: true },
-      { title: 'Thermodynamics', done: false },
-      { title: 'Chemical Kinetics', done: false }
-    ]
-  },
-  { 
-    name: 'Mathematics', 
-    completed: 2, 
-    total: 5, 
-    quizAvg: 65, 
-    color: '#F4A261', 
-    sessions: [2, 1, 3, 2, 4, 3, 2],
-    chapters: [
-      { title: 'Calculus Integrals', done: true },
-      { title: 'Matrices & Determinants', done: true },
-      { title: 'Probability & Stats', done: false },
-      { title: 'Trigonometry', done: false },
-      { title: 'Linear Algebra', done: false }
-    ]
-  },
-  { 
-    name: 'History', 
-    completed: 3, 
-    total: 4, 
-    quizAvg: 72, 
-    color: '#A8DADC', 
-    sessions: [3, 4, 2, 3, 2, 4, 3],
-    chapters: [
-      { title: 'Medieval Revolutions', done: true },
-      { title: 'Ancient Civilizations', done: true },
-      { title: 'Industrialization Ages', done: true },
-      { title: 'Modern Alliances', done: false }
-    ]
-  },
-];
+const subjectData = [];
 
 const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const maxSessions = 7;
@@ -74,13 +13,15 @@ export default function ProgressChart() {
     <div className="progress-panel">
       <div className="panel-header">
         <h2 className="panel-title">📊 Progress Nursery</h2>
-        <p className="panel-subtitle">Watch your subjects sprout and grow. Review exact chapter completed vs total counts per subject scope.</p>
+        <p className="panel-subtitle">Add subject data to see progress rings and charts here.</p>
       </div>
 
       {/* Subject Filter Pills */}
       <div className="subject-pills">
         <button onClick={() => setActiveSubject(null)} className={`pill-btn sketch-border-sm ${!activeSubject ? 'pill-active' : ''}`}>All Subjects</button>
-        {subjectData.map(s => (
+        {subjectData.length === 0 ? (
+          <span className="progress-empty handwriting">No subjects added yet.</span>
+        ) : subjectData.map(s => (
           <button key={s.name} onClick={() => setActiveSubject(s.name === activeSubject ? null : s.name)}
             className={`pill-btn sketch-border-sm ${activeSubject === s.name ? 'pill-active' : ''}`}
             style={{ '--pill-color': s.color }}>
@@ -91,7 +32,9 @@ export default function ProgressChart() {
 
       {/* Radial Progress Rings displaying Completed vs Total */}
       <div className="rings-grid">
-        {displayed.map(s => {
+        {displayed.length === 0 ? (
+          <div className="progress-empty-card sketch-border-sm">No progress data yet.</div>
+        ) : displayed.map(s => {
           const r = 46;
           const circ = 2 * Math.PI * r;
           const pct = Math.round((s.completed / s.total) * 100);
@@ -146,7 +89,9 @@ export default function ProgressChart() {
         <h3 className="card-section-title">📅 Weekly Study Nursery (Sessions vs Sprouts)</h3>
         <p className="text-xs text-gray-500 mb-2">Each completed hour feeds your subject sprout, causing it to blossom higher on the canvas!</p>
         
-        {displayed.map(s => (
+        {displayed.length === 0 ? (
+          <div className="progress-empty-card sketch-border-sm">Add study blocks to see weekly sessions.</div>
+        ) : displayed.map(s => (
           <div key={s.name} className="bar-chart-row mt-3">
             <span className="bar-subject-label font-bold">{s.name}</span>
             <div className="bars-container">

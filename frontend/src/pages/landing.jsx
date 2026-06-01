@@ -79,7 +79,7 @@ export default function Landing() {
           </h1>
 
           <p className="hero-subtitle">
-            Say goodbye to cold, robotic, notification-heavy dashboards. <strong>Mansi</strong> is a mindful digital study cabinet crafted with warm wood rings, hand-drawn planners, tactile quizzes, and revision branches designed to make focus feel organic and calming.
+            Say goodbye to cold, robotic, notification-heavy dashboards. <strong>Woody</strong> is a mindful digital study cabinet crafted with warm wood rings, hand-drawn planners, tactile quizzes, and revision branches designed to make focus feel organic and calming.
           </p>
 
           <div className="hero-actions">
@@ -134,16 +134,16 @@ export default function Landing() {
               {/* Books on the shelf */}
               <div className="shelf-books">
                 <div className="book book-1 sketch-border-sm" title="Study planner notebook">
-                  <span className="book-spine">BIO</span>
+                  <span className="book-spine">TASK</span>
                 </div>
                 <div className="book book-2 sketch-border-sm" title="Quiz compiler">
-                  <span className="book-spine">MATH</span>
+                  <span className="book-spine">PLAN</span>
                 </div>
                 <div className="book book-3 sketch-border-sm" title="Revision notes">
-                  <span className="book-spine">CHEM</span>
+                  <span className="book-spine">QUIZ</span>
                 </div>
                 <div className="book book-4 sketch-border-sm" title="Growth records">
-                  <span className="book-spine">HIST</span>
+                  <span className="book-spine">NOTE</span>
                 </div>
               </div>
 
@@ -260,7 +260,7 @@ export default function Landing() {
             <div className="desk-notebook sketch-border-sm">
               <div className="notebook-binder"></div>
               <div className="notebook-page-left">
-                <h4 className="notebook-h4">Mansi Desk</h4>
+                <h4 className="notebook-h4">Woody Desk</h4>
                 <p className="notebook-p">Interactive study objects react to your focus routine.</p>
                 <div className="paper-doodle">
                   <svg width="70" height="20" viewBox="0 0 70 20" fill="none">
@@ -444,7 +444,7 @@ export default function Landing() {
       <section className="testimonials-section" id="about">
         <div className="section-header">
           <span className="handwritten" style={{ fontSize: '32px' }}>What students are crafting...</span>
-          <h2 className="section-title">Word from Pinned Desks</h2>
+          <h2 className="section-title">What the Cabin Gives You</h2>
         </div>
 
         <div className="testimonials-corkboard sketch-border">
@@ -461,9 +461,9 @@ export default function Landing() {
               </svg>
             </div>
               <p className="testimonial-text">
-              "Building study plan roadmaps here feels like organizing my desk drawer. It is so visual, slow, and therapeutic."
+              Start with one subject, add chapters as you go, and keep the plan uncluttered.
             </p>
-            <h4 className="student-name handwritten">- Mansi, Biology Student</h4>
+            <h4 className="student-name handwritten">Study Plan</h4>
           </div>
 
           {/* Testimonial Polaroid 2 */}
@@ -476,9 +476,9 @@ export default function Landing() {
               </svg>
             </div>
             <p className="testimonial-text">
-              "The tactile paper trials quizzes are so peaceful. No game timers flashing red or screeching points. Just peaceful learning at my own page rhythm."
+              Upload your own notes or syllabus and build a quiz from your material.
             </p>
-            <h4 className="student-name handwritten">- Kiara M., Prep Student</h4>
+            <h4 className="student-name handwritten">Quiz Builder</h4>
           </div>
 
           {/* Testimonial Polaroid 3 */}
@@ -491,9 +491,9 @@ export default function Landing() {
               </svg>
             </div>
             <p className="testimonial-text">
-              "Having the hourglass blocks instead of harsh alarms is a complete mindset shift. I set my timetable, flip the sand glass, and sink into my chemistry books."
+              Set your own blocks, breaks, and review windows without any preset routine.
             </p>
-            <h4 className="student-name handwritten">- Dev K., MCAT Candidate</h4>
+            <h4 className="student-name handwritten">Timetable</h4>
           </div>
         </div>
       </section>
@@ -508,7 +508,7 @@ export default function Landing() {
                 <path d="M18 3.5V0" stroke="#2D2C24" strokeWidth="2" />
                 <path d="M18 1.5C18.8 0.5 20 0 21 0" stroke="#2D2C24" strokeWidth="1.8" />
               </svg>
-              <span className="font-bold">Mansi</span>
+              <span className="font-bold">Woody</span>
             </div>
             <p className="footer-desc text-xs mt-2">
               A calm, structure-focused learning cabinet. Carving beautiful routines, organic plans, and mindful progress records.
@@ -540,7 +540,7 @@ export default function Landing() {
 
         <div className="footer-bottom">
           <p className="text-xxs font-mono text-center">
-            &copy; {new Date().getFullYear()} Mansi Planner Cabin. Hand-crafted in a warm study theme. Keep carving knowledge slowly.
+            &copy; {new Date().getFullYear()} Woody Planner Cabin. Hand-crafted in a warm study theme. Keep carving knowledge slowly.
           </p>
         </div>
       </footer>
