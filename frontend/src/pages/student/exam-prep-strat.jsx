@@ -1,13 +1,134 @@
 import React, { useState } from 'react';
 
-const strategies = [];
+const strategies = [
+  {
+    id: 'ecology',
+    subject: '🌲 Forest Ecology',
+    color: 'var(--wood-sage)',
+    daysLeft: 5,
+    phases: [
+      {
+        phase: 'Root Knowledge',
+        weeks: 'Weeks 1-2',
+        tasks: [
+          'Read chapters 1-4 on forest biomes and soil microbiology',
+          'Highlight key definitions of symbiosis and mycorrhizae',
+          'Draw the nitrogen and carbon nutrient cycles by hand'
+        ]
+      },
+      {
+        phase: 'Canopy Deep-Dive',
+        weeks: 'Weeks 3-4',
+        tasks: [
+          'Review tricky flashcards on plant and tree adaptations',
+          'Take the mid-term practice test on ecosystem equilibrium',
+          'Attend peer study group in the cabin library'
+        ]
+      },
+      {
+        phase: 'Harvest & Review',
+        weeks: 'Exam Week',
+        tasks: [
+          'Solve 3 past exam essay question papers under timed conditions',
+          'Conduct an active-recall session on all handwritten charts',
+          'Get a full night of restful sleep before exam day ☕'
+        ]
+      }
+    ],
+    tips: [
+      'Study in 45-minute blocks, then step outside to look at real green leaves to rest your eyes.',
+      'Draw connections between topics as branching trees—it assists visual memory.',
+      'Explain the nitrogen cycle aloud to your pet or a plush toy to test your teaching flow.'
+    ]
+  },
+  {
+    id: 'physics',
+    subject: '🍃 Acoustic Physics',
+    color: '#F4A261', // var(--wood-clay) equivalent
+    daysLeft: 12,
+    phases: [
+      {
+        phase: 'Wave Mechanics Foundation',
+        weeks: 'Weeks 1-2',
+        tasks: [
+          'Derive core formulas for sound wave propagation and velocity',
+          'Solve 20 fundamental mechanics questions on harmonics',
+          'Visualize wave interference and superposition patterns'
+        ]
+      },
+      {
+        phase: 'Resonance & Resonance Decay',
+        weeks: 'Weeks 3-4',
+        tasks: [
+          'Analyze acoustic properties of string and wind instruments',
+          'Complete the mid-term mock acoustic assessment',
+          'Create a single-page cheatsheet of wave equations'
+        ]
+      },
+      {
+        phase: 'Final Tuning',
+        weeks: 'Exam Week',
+        tasks: [
+          'Review the physics formulas in the Revision Desk deck',
+          'Re-solve all incorrect homework questions from the semester',
+          'Relax, clear your mind, and listen to cozy ambient soundscapes'
+        ]
+      }
+    ],
+    tips: [
+      'Try listening to instrumental acoustic guitar music while solving equation sets.',
+      'Remember: frequency is the heartbeat of sound. Keep your study frequency steady!',
+      'Formulas are easier to remember if you understand the physical relationship they describe.'
+    ]
+  },
+  {
+    id: 'literature',
+    subject: '📜 Medieval Literature',
+    color: 'var(--wood-accent)',
+    daysLeft: 19,
+    phases: [
+      {
+        phase: 'Manuscript Reading',
+        weeks: 'Weeks 1-2',
+        tasks: [
+          'Finish reading "Beowulf" and "The Canterbury Tales"',
+          'Take detailed notes on recurring archetypes and epic themes',
+          'Research the socio-political context of 14th-century writers'
+        ]
+      },
+      {
+        phase: 'Thematic Analysis',
+        weeks: 'Weeks 3-4',
+        tasks: [
+          'Write 3 short outlines comparing chivalry and courtly love',
+          'Discuss major literary themes with peers or in a study forum',
+          'Review lecture slides on Old and Middle English linguistics'
+        ]
+      },
+      {
+        phase: 'Scribe\'s Final Review',
+        weeks: 'Exam Week',
+        tasks: [
+          'Memorize key literary quotes for textual support in essays',
+          'Outline essay structures for 5 potential exam prompts',
+          'Do a mock timed writing session to practice pacing'
+        ]
+      }
+    ],
+    tips: [
+      'Write your essay outlines with pen and paper—it feels more medieval and aids memory retention!',
+      'Don\'t just memorize the plot; focus on the *why* behind the characters\' choices.',
+      'Keep a cup of warm tea nearby to stay cozy and focused during long reading sessions.'
+    ]
+  }
+];
 
 export default function ExamPrepStrat() {
-  const [activeStrat, setActiveStrat] = useState(null);
+  const [activeStrat, setActiveStrat] = useState(strategies[0]?.id || null);
   const [phasesDone, setPhasesDone] = useState({});
 
   const strat = strategies.find(s => s.id === activeStrat);
-  const done = phasesDone[activeStrat] || [];
+  const done = phasesDone[activeStrat] || (strat ? new Array(strat.phases.length).fill(false) : []);
 
   const togglePhase = (idx) => {
     const updated = done.map((d, i) => i === idx ? !d : d);
@@ -43,7 +164,7 @@ export default function ExamPrepStrat() {
       <div className="strat-completion-bar-wrap">
         <span className="strat-completion-label">Strategy Completion: {overallProgress}%</span>
         <div className="strat-completion-bar sketch-border-sm">
-          <div className="strat-completion-fill" style={{ width: `${overallProgress}%`, background: strat.color }}></div>
+          <div className="strat-completion-fill" style={{ width: `${overallProgress}%`, background: strat?.color || 'var(--wood-accent)' }}></div>
         </div>
       </div>
 
@@ -71,7 +192,7 @@ export default function ExamPrepStrat() {
             <ul className="phase-tasks">
               {p.tasks.map((t, ti) => (
                 <li key={ti} className="phase-task-item sketch-border-sm">
-                  <span className="task-bullet" style={{ background: strat.color }}></span>
+                  <span className="task-bullet" style={{ background: strat?.color || 'var(--wood-accent)' }}></span>
                   {t}
                 </li>
               ))}
