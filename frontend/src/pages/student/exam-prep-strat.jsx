@@ -43,7 +43,7 @@ export default function ExamPrepStrat() {
       <div className="strat-completion-bar-wrap">
         <span className="strat-completion-label">Strategy Completion: {overallProgress}%</span>
         <div className="strat-completion-bar sketch-border-sm">
-          <div className="strat-completion-fill" style={{ width: `${overallProgress}%`, background: strat.color }}></div>
+          <div className="strat-completion-fill" style={{ width: `${overallProgress}%`, background: strat?.color }}></div>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export default function ExamPrepStrat() {
             <ul className="phase-tasks">
               {p.tasks.map((t, ti) => (
                 <li key={ti} className="phase-task-item sketch-border-sm">
-                  <span className="task-bullet" style={{ background: strat.color }}></span>
+                  <span className="task-bullet" style={{ background: strat?.color }}></span>
                   {t}
                 </li>
               ))}
