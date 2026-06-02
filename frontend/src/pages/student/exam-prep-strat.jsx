@@ -1,5 +1,146 @@
 import React, { useState } from 'react';
 
+const INITIAL_STRATEGIES = [
+  {
+    id: 'ecology',
+    subject: '🌲 Forest Ecology',
+    color: 'var(--wood-sage)',
+    examDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 5 days from today
+    phases: [
+      {
+        id: 'eco-p1',
+        phase: 'Root Knowledge',
+        weeks: 'Weeks 1-2',
+        tasks: [
+          'Read chapters 1-4 on forest biomes and soil microbiology',
+          'Highlight key definitions of symbiosis and mycorrhizae',
+          'Draw the nitrogen and carbon nutrient cycles by hand'
+        ],
+        done: false
+      },
+      {
+        id: 'eco-p2',
+        phase: 'Canopy Deep-Dive',
+        weeks: 'Weeks 3-4',
+        tasks: [
+          'Review tricky flashcards on plant and tree adaptations',
+          'Take the mid-term practice test on ecosystem equilibrium',
+          'Attend peer study group in the cabin library'
+        ],
+        done: false
+      },
+      {
+        id: 'eco-p3',
+        phase: 'Harvest & Review',
+        weeks: 'Exam Week',
+        tasks: [
+          'Solve 3 past exam essay question papers under timed conditions',
+          'Conduct an active-recall session on all handwritten charts',
+          'Get a full night of restful sleep before exam day ☕'
+        ],
+        done: false
+      }
+    ],
+    tips: [
+      'Study in 45-minute blocks, then step outside to look at real green leaves to rest your eyes.',
+      'Draw connections between topics as branching trees—it assists visual memory.',
+      'Explain the nitrogen cycle aloud to your pet or a plush toy to test your teaching flow.'
+    ]
+  },
+  {
+    id: 'physics',
+    subject: '🍃 Acoustic Physics',
+    color: '#F4A261', // var(--wood-clay) equivalent
+    examDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 12 days from today
+    phases: [
+      {
+        id: 'phys-p1',
+        phase: 'Wave Mechanics Foundation',
+        weeks: 'Weeks 1-2',
+        tasks: [
+          'Derive core formulas for sound wave propagation and velocity',
+          'Solve 20 fundamental mechanics questions on harmonics',
+          'Visualize wave interference and superposition patterns'
+        ],
+        done: false
+      },
+      {
+        id: 'phys-p2',
+        phase: 'Resonance & Resonance Decay',
+        weeks: 'Weeks 3-4',
+        tasks: [
+          'Analyze acoustic properties of string and wind instruments',
+          'Complete the mid-term mock acoustic assessment',
+          'Create a single-page cheatsheet of wave equations'
+        ],
+        done: false
+      },
+      {
+        id: 'phys-p3',
+        phase: 'Final Tuning',
+        weeks: 'Exam Week',
+        tasks: [
+          'Review the physics formulas in the Revision Desk deck',
+          'Re-solve all incorrect homework questions from the semester',
+          'Relax, clear your mind, and listen to cozy ambient soundscapes'
+        ],
+        done: false
+      }
+    ],
+    tips: [
+      'Try listening to instrumental acoustic guitar music while solving equation sets.',
+      'Remember: frequency is the heartbeat of sound. Keep your study frequency steady!',
+      'Formulas are easier to remember if you understand the physical relationship they describe.'
+    ]
+  },
+  {
+    id: 'literature',
+    subject: '📜 Medieval Literature',
+    color: 'var(--wood-accent)',
+    examDate: new Date(Date.now() + 19 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 19 days from today
+    phases: [
+      {
+        id: 'lit-p1',
+        phase: 'Manuscript Reading',
+        weeks: 'Weeks 1-2',
+        tasks: [
+          'Finish reading "Beowulf" and "The Canterbury Tales"',
+          'Take detailed notes on recurring archetypes and epic themes',
+          'Research the socio-political context of 14th-century writers'
+        ],
+        done: false
+      },
+      {
+        id: 'lit-p2',
+        phase: 'Thematic Analysis',
+        weeks: 'Weeks 3-4',
+        tasks: [
+          'Write 3 short outlines comparing chivalry and courtly love',
+          'Discuss major literary themes with peers or in a study forum',
+          'Review lecture slides on Old and Middle English linguistics'
+        ],
+        done: false
+      },
+      {
+        id: 'lit-p3',
+        phase: 'Scribe\'s Final Review',
+        weeks: 'Exam Week',
+        tasks: [
+          'Memorize key literary quotes for textual support in essays',
+          'Outline essay structures for 5 potential exam prompts',
+          'Do a mock timed writing session to practice pacing'
+        ],
+        done: false
+      }
+    ],
+    tips: [
+      'Write your essay outlines with pen and paper—it feels more medieval and aids memory retention!',
+      'Don\'t just memorize the plot; focus on the *why* behind the characters\' choices.',
+      'Keep a cup of warm tea nearby to stay cozy and focused during long reading sessions.'
+    ]
+  }
+];
+
 const SWATCHES = ['#E6A817', '#7BA05B', '#C97B5A', '#5A8CA0', '#B05A8C', '#8C7BA0'];
 
 const computeDaysLeft = (dateStr) => {
@@ -19,8 +160,8 @@ const daysLabel = (d) => {
 };
 
 export default function ExamPrepStrat() {
-  const [strategies, setStrategies] = useState([]);
-  const [activeStrat, setActiveStrat] = useState(null);
+  const [strategies, setStrategies] = useState(INITIAL_STRATEGIES);
+  const [activeStrat, setActiveStrat] = useState(INITIAL_STRATEGIES[0]?.id || null);
 
   // New strategy form
   const [newSubject, setNewSubject] = useState('');
@@ -242,7 +383,7 @@ export default function ExamPrepStrat() {
           Strategy Completion: {overallProgress}%{strat ? ` — ${strat.subject}` : ''}
         </span>
         <div className="strat-completion-bar sketch-border-sm">
-          <div className="strat-completion-fill" style={{ width: `${overallProgress}%`, background: strat?.color }}></div>
+          <div className="strat-completion-fill" style={{ width: `${overallProgress}%`, background: strat?.color || 'var(--wood-accent)' }}></div>
         </div>
       </div>
 
@@ -270,7 +411,7 @@ export default function ExamPrepStrat() {
             <ul className="phase-tasks">
               {p.tasks.map((t, ti) => (
                 <li key={ti} className="phase-task-item sketch-border-sm">
-                  <span className="task-bullet" style={{ background: strat?.color }}></span>
+                  <span className="task-bullet" style={{ background: strat?.color || 'var(--wood-accent)' }}></span>
                   <span className="task-text">{t}</span>
                   <button className="task-del" onClick={() => deleteTask(p.id, ti)} aria-label="delete task">✕</button>
                 </li>
