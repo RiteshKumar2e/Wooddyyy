@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './component/navbar.jsx';
+import Footer from './component/footer.jsx';
 import Landing from './pages/landing.jsx';
 import LoginPage from './pages/login-page.jsx';
 import RegisterPage from './pages/register-page.jsx';
@@ -42,6 +43,7 @@ function App() {
         {view === 'login'     && <LoginPage />}
         {view === 'register'  && <RegisterPage />}
       </main>
+      <Footer />
     </div>
   );
 }
