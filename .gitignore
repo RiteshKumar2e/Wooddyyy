@@ -6,13 +6,17 @@ dist
 dist-ssr
 build
 
-# Environment files
+# Environment files (never commit real secrets)
 .env
 .env.*
 backend/.env
 backend/.env.*
 frontend/.env
 frontend/.env.*
+# ...but keep the placeholder templates so the structure is shareable
+!.env.example
+!backend/.env.example
+!frontend/.env.example
 
 # Logs
 *.log
