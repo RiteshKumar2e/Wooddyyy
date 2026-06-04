@@ -1,0 +1,204 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  padding: 40px 20px;
+  position: relative;
+  gap: 50px;
+}
+
+.register-paper {
+  background-color: var(--wood-card);
+  width: 100%;
+  max-width: 530px;
+  padding: 45px 36px 36px;
+  position: relative;
+  box-shadow: var(--wood-shadow);
+}
+
+@media (max-width: 530px) {
+  .register-paper {
+    padding: 35px 24px 24px;
+  }
+}
+
+/* Physical tape styling at top */
+.paper-tape {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  width: 120px;
+  height: 25px;
+  background-color: rgba(253, 242, 204, 0.7); /* translucent tape */
+  border: 1px dashed rgba(45, 44, 36, 0.2);
+  z-index: 10;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.register-title {
+  font-size: 28px;
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.register-subtitle {
+  font-size: 14px;
+  color: var(--wood-ink-muted);
+  line-height: 1.4;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-family: var(--heading);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--wood-ink);
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--sans);
+  font-size: 14.5px;
+  background-color: var(--wood-bg);
+  color: var(--wood-ink);
+  border: 2px solid var(--wood-ink);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  background-color: #FFFDF0;
+  border-color: var(--wood-primary) !important;
+}
+
+.password-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+@media (max-width: 530px) {
+  .password-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--wood-ink-muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.password-toggle-btn:hover {
+  color: var(--wood-ink);
+}
+
+.input-error {
+  border-color: #D32F2F !important;
+  background-color: #FFEBEE !important;
+}
+
+.password-mismatch-warning {
+  font-size: 20px;
+  color: #D32F2F;
+  margin-top: 4px;
+}
+
+.remember-me-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  accent-color: var(--wood-primary);
+  cursor: pointer;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  background-color: var(--wood-bg) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.register-footer {
+  margin-top: 24px;
+  border-top: 2px dashed var(--wood-border-light);
+  padding-top: 18px;
+  font-size: 14px;
+  color: var(--wood-ink-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-redirect-link {
+  color: var(--wood-primary);
+}
+
+.login-redirect-link:hover {
+  color: var(--wood-primary-hover);
+}
+
+/* Decorative Sprout Left Illustration */
+.desk-sprout-illustration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .desk-sprout-illustration {
+    display: none;
+  }
+}
+
+.sprout-text {
+  font-size: 18px;
+  color: var(--wood-ink-muted);
+  margin-top: 8px;
+}
+
+.flower-grow-svg {
+  animation: bloom 1.5s ease-out infinite alternate;
+  transform-origin: bottom center;
+}
+
+@keyframes bloom {
+  0% { transform: scale(0.95); }
+  100% { transform: scale(1.05); }
+}

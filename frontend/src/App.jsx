@@ -4,6 +4,7 @@ import Landing from './pages/landing.jsx';
 import LoginPage from './pages/login-page.jsx';
 import RegisterPage from './pages/register-page.jsx';
 import Dashboard from './pages/student/dashboard.jsx';
+import './App.css';
 
 function App() {
   const [view, setView] = useState('landing');
@@ -41,22 +42,6 @@ function App() {
         {view === 'login'     && <LoginPage />}
         {view === 'register'  && <RegisterPage />}
       </main>
-
-      <style>{`
-        .app-workspace {
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-          width: 100%;
-        }
-        .main-content {
-          flex: 1 0 auto;
-          width: 100%;
-          max-width: none;
-          margin: 0;
-          padding-bottom: 40px;
-        }
-      `}</style>
     </div>
   );
 }

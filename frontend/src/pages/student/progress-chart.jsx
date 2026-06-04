@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../../styles/student/progress-chart.css';
 
 const subjectData = [];
 
@@ -116,58 +117,6 @@ export default function ProgressChart() {
           </div>
         ))}
       </div>
-
-      <style>{`
-        .progress-panel { display: flex; flex-direction: column; gap: 26px; }
-        
-        .subject-pills { display: flex; gap: 10px; flex-wrap: wrap; }
-        .pill-btn { font-family: var(--heading); font-weight: 600; font-size: 13px; padding: 7px 16px; background: var(--wood-card); cursor: pointer; border: 2px solid var(--wood-ink); transition: all 0.2s; }
-        .pill-btn:hover { background: var(--pill-color, var(--wood-accent)); transform: translateY(-2px); }
-        .pill-btn.pill-active { background: var(--pill-color, var(--wood-primary)); box-shadow: 3px 3px 0 var(--wood-ink); }
-        
-        .rings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 22px; }
-        .ring-card { background: var(--wood-card); padding: 20px; display: flex; flex-direction: column; cursor: pointer; transition: all 0.25s; }
-        .ring-card:hover { transform: translateY(-4px); }
-        
-        .card-top-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--wood-border-light); padding-bottom: 8px; }
-        .ring-subject-name { font-family: var(--heading); font-size: 16px; font-weight: 700; }
-        
-        .card-ring-body { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; }
-        @media (max-width: 500px) { .card-ring-body { grid-template-columns: 1fr; justify-items: center; } }
-        
-        .ring-card-chapters-checklist { background: var(--wood-bg); padding: 10px; height: 110px; overflow-y: auto; width: 100%; box-sizing: border-box; }
-        .checklist-items-list { list-style: none; display: flex; flex-direction: column; gap: 4px; padding-left: 2px; }
-        .checklist-items-list li { display: flex; gap: 6px; align-items: center; }
-        .checked-item .chk-label { text-decoration: line-through; color: var(--wood-ink-muted); }
-        .unchecked-item .chk-label { font-weight: bold; color: var(--wood-ink); }
-
-        .ring-quiz-avg { font-size: 12px; color: var(--wood-ink-muted); }
-        .badge-small { font-size: 10px; font-weight: bold; font-family: var(--heading); border: 1px solid var(--wood-ink); padding: 1px 6px; border-radius: 4px; text-transform: uppercase; }
-        .bg-sky { background: #E0F7FA; }
-
-        .bar-chart-card { background: var(--wood-card); padding: 26px; display: flex; flex-direction: column; gap: 14px; }
-        .card-section-title { font-family: var(--heading); font-size: 18px; }
-        
-        .bar-chart-row { display: flex; align-items: flex-end; gap: 16px; }
-        .bar-subject-label { font-family: var(--heading); font-size: 13px; width: 95px; flex-shrink: 0; text-align: right; }
-        .bars-container { display: flex; gap: 12px; align-items: flex-end; height: 110px; position: relative; }
-        .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
-        
-        .nursery-flower-sprout {
-          position: absolute;
-          font-size: 15px;
-          bottom: 24px;
-          left: 50%;
-          transform-origin: bottom center;
-          animation: sway 2s infinite alternate ease-in-out;
-        }
-        @keyframes sway { 0% { transform: translate(-50%, 0) rotate(-4deg); } 100% { transform: translate(-50%, 0) rotate(4deg); } }
-
-        .bar-col:hover .bar-tooltip { opacity: 1; }
-        .bar-tooltip { position: absolute; top: -24px; font-size: 11px; font-family: var(--heading); font-weight: 700; background: var(--wood-ink); color: #fff; padding: 2px 6px; border-radius: 3px; opacity: 0; transition: opacity 0.2s; white-space: nowrap; z-index: 10; }
-        .bar-fill { width: 26px; transition: height 0.5s cubic-bezier(0.4,0,0.2,1); }
-        .bar-day-label { font-size: 10px; font-family: var(--heading); color: var(--wood-ink-muted); }
-      `}</style>
     </div>
   );
 }

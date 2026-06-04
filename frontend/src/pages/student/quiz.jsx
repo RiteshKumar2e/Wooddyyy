@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import '../../styles/student/quiz.css';
 
 export default function Quiz() {
   // Setup States
@@ -265,67 +266,6 @@ export default function Quiz() {
 
           </div>
         )}
-        
-        <style>{`
-          .quiz-setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-          @media (max-width: 768px) { .quiz-setup-grid { grid-template-columns: 1fr; } }
-          
-          .uploader-card, .config-card { background: var(--wood-card); padding: 24px; display: flex; flex-direction: column; }
-          .upload-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-          .upload-main-icon { font-size: 28px; }
-          
-          .drag-upload-box {
-            background: var(--wood-bg);
-            border: 2px dashed var(--wood-ink);
-            padding: 24px 16px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-          }
-          .file-success-badge {
-            background: var(--wood-sage);
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            font-weight: 700;
-          }
-          .hidden-file-input { display: none; }
-
-          .config-group { display: flex; flex-direction: column; gap: 6px; }
-          .config-label { font-family: var(--heading); font-weight: 700; font-size: 13px; }
-          .config-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-          .config-btn {
-            background: var(--wood-bg);
-            border: 2px solid var(--wood-ink);
-            padding: 10px 4px;
-            font-family: var(--heading);
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-          }
-          .config-btn:hover { background: var(--wood-accent); }
-          .config-btn.active { background: var(--wood-primary); box-shadow: 2px 2px 0 var(--wood-ink); }
-          
-          .config-select {
-            padding: 8px 12px;
-            font-family: var(--sans);
-            font-size: 13.5px;
-            background: var(--wood-bg);
-            border: 2px solid var(--wood-ink);
-            outline: none;
-            width: 100%;
-          }
-          
-          .quiz-generating-card { background: var(--wood-card); padding: 48px; }
-          .carving-icon { font-size: 48px; animation: heartbeat 1.2s infinite alternate; }
-          @keyframes heartbeat { 0% { transform: scale(0.9); } 100% { transform: scale(1.1); } }
-          .text-gold { color: var(--wood-primary-hover); }
-          .color-primary { color: var(--wood-primary-hover); }
-        `}</style>
       </div>
     );
   }
@@ -478,36 +418,6 @@ export default function Quiz() {
             🔄 Return to Cabin Setup
           </button>
         </div>
-
-        <style>{`
-          .quiz-result-wrapper { background: var(--wood-card); padding: 36px; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; position: relative; }
-          .result-tape { position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-1deg); width: 90px; height: 22px; background: rgba(253,242,204,0.7); border: 1px dashed rgba(45,44,36,0.2); }
-          .results-summary-row { display: grid; grid-template-columns: 140px 1fr; gap: 24px; margin-top: 18px; align-items: center; }
-          @media (max-width: 500px) { .results-summary-row { grid-template-columns: 1fr; justify-items: center; } }
-          
-          .score-breakdown-details { background: var(--wood-bg); padding: 14px; width: 100%; box-sizing: border-box; }
-          .breakdown-grid { display: flex; flex-direction: column; gap: 8px; }
-          .break-item { font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-          .bullet { font-size: 14px; }
-          .bullet.green { color: #2e7d32; }
-          .bullet.red { color: #c62828; }
-          .bullet.yellow { color: #ef6c00; }
-          
-          .results-review-list { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
-          .review-question-item { background: var(--wood-bg); padding: 18px; display: flex; flex-direction: column; }
-          .review-q-header { display: flex; gap: 6px; }
-          .review-answers-box { background: var(--wood-card); padding: 12px; border-left: 3px solid var(--wood-ink); margin-top: 8px; }
-          
-          .subjective-user-quote { color: #5d4037; padding: 6px 12px; border-left: 2px dashed var(--wood-ink-muted); margin: 4px 0 8px; }
-          .subjective-sample-quote { padding: 6px 12px; background: rgba(255,255,255,0.4); border-left: 2px solid var(--wood-primary); margin: 4px 0 8px; }
-          .bg-yellow-soft { background: #FFFDE7; }
-          .display-flex { display: flex; }
-          .mx-auto { margin-left: auto; margin-right: auto; }
-          
-          .color-green { color: #2e7d32; }
-          .color-red { color: #c62828; }
-          .color-yellow { color: #ef6c00; }
-        `}</style>
       </div>
     );
   }
@@ -648,69 +558,6 @@ export default function Quiz() {
           </button>
         )}
       </div>
-
-      <style>{`
-        .quiz-panel { display: flex; flex-direction: column; gap: 20px; }
-        
-        .quiz-stats-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--wood-card); }
-        .timer-block { display: flex; align-items: center; gap: 6px; }
-        .timer-warning { color: #d32f2f; animation: pulse 0.8s infinite alternate; }
-        @keyframes pulse { 0% { opacity: 0.7; } 100% { opacity: 1; transform: scale(1.05); } }
-        
-        .timer-progressbar-wrap { height: 8px; background: var(--wood-bg); overflow: hidden; }
-        .timer-progressbar-fill { height: 100%; background: var(--wood-primary); transition: width 1s linear; }
-        .fill-warning { background: #d32f2f !important; }
-
-        .question-card { background: var(--wood-card); padding: 30px; display: flex; flex-direction: column; gap: 20px; position: relative; }
-        .q-subject-badge { display: inline-block; background: var(--wood-accent); border: 1.5px solid var(--wood-ink); padding: 3px 12px; font-family: var(--heading); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; align-self: flex-start; }
-        .q-text { font-family: var(--heading); font-size: 19px; line-height: 1.45; }
-        
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        @media (max-width: 640px) { .options-grid { grid-template-columns: 1fr; } }
-        
-        .quiz-option { background: var(--wood-bg); border: 2px solid var(--wood-ink); padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; text-align: left; transition: all 0.2s; font-family: var(--sans); }
-        .quiz-option:hover { background: var(--wood-accent); transform: translateX(2px); }
-        .option-correct { background: var(--wood-sage) !important; border-color: #2e7d32 !important; }
-        .option-wrong { background: #FFEBEE !important; border-color: #c62828 !important; }
-        .option-faded { opacity: 0.55; cursor: not-allowed; }
-        .option-letter { font-family: var(--heading); font-weight: 700; font-size: 16px; width: 24px; flex-shrink: 0; }
-        .option-text { flex: 1; font-size: 14px; line-height: 1.4; }
-        .option-tick { font-size: 18px; flex-shrink: 0; }
-        
-        .subjective-textarea { background: var(--wood-bg); padding: 14px; font-family: var(--sans); width: 100%; border: 2.5px solid var(--wood-ink); outline: none; }
-        .subjective-reveal-box { background: var(--wood-bg); padding: 18px; border: 2.5px solid var(--wood-ink); }
-        .rubric-comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 600px) { .rubric-comparison-grid { grid-template-columns: 1fr; } }
-        
-        .rubric-column { display: flex; flex-direction: column; gap: 4px; }
-        .user-response-quote { background: var(--wood-card); padding: 10px; border-left: 3px dashed var(--wood-ink-muted); margin: 0; font-style: italic; line-height: 1.4; }
-        .sample-response-quote { background: var(--wood-card); padding: 10px; border-left: 3px solid var(--wood-primary); margin: 0; line-height: 1.4; }
-        
-        .self-grade-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        .grade-btn {
-          width: 80%;
-          max-width: 400px;
-          padding: 8px 12px;
-          border: 2px solid var(--wood-ink);
-          font-family: var(--heading);
-          font-size: 12.5px;
-          font-weight: 700;
-          cursor: pointer;
-          border-radius: 6px;
-          transition: all 0.2s;
-        }
-        .grade-btn:hover { transform: translateY(-2px); box-shadow: 2px 2px 0 var(--wood-ink); }
-        
-        .bg-sage { background: var(--wood-sage); }
-        .bg-yellow { background: #FFF9C4; }
-        .bg-pink { background: #FFEBEE; }
-        
-        .explanation-box { background: #FFFDE7; padding: 16px; position: relative; }
-        .explain-label { position: absolute; top: -15px; left: 16px; background: var(--wood-card); border: 1.5px solid var(--wood-ink); padding: 2px 8px; font-size: 16px; }
-        .explain-text { font-size: 14px; color: var(--wood-ink); line-height: 1.5; margin-top: 4px; }
-        .next-btn { align-self: flex-end; }
-        .self-end { align-self: flex-end; }
-      `}</style>
     </div>
   );
 }
