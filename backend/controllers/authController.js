@@ -19,7 +19,7 @@ const publicUser = (user) => ({
 
 // @route   POST /api/auth/register
 // @access  Public
-const register = async (req, res, next) => {
+const register = async (req, res) => {
   try {
     const { fullName, email, phone, password } = req.body;
 
@@ -39,13 +39,21 @@ const register = async (req, res, next) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    return next(error);
+    console.error('💥 Register error:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((e) => e.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'An account with this email already exists' });
+    }
+    return res.status(500).json({ message: error.message || 'Registration failed' });
   }
 };
 
 // @route   POST /api/auth/login
 // @access  Public
-const login = async (req, res, next) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -65,7 +73,8 @@ const login = async (req, res, next) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    return next(error);
+    console.error('💥 Login error:', error);
+    return res.status(500).json({ message: error.message || 'Login failed' });
   }
 };
 
@@ -77,7 +86,7 @@ const getMe = async (req, res) => {
 
 // @route   PUT /api/auth/me
 // @access  Private  (profile page: fullName, phone, goal, timezone)
-const updateProfile = async (req, res, next) => {
+const updateProfile = async (req, res) => {
   try {
     const { fullName, phone, goal, timezone } = req.body;
     const user = req.user;
@@ -90,7 +99,8 @@ const updateProfile = async (req, res, next) => {
     await user.save();
     return res.json({ user: publicUser(user) });
   } catch (error) {
-    return next(error);
+    console.error('💥 UpdateProfile error:', error);
+    return res.status(500).json({ message: error.message || 'Profile update failed' });
   }
 };
 

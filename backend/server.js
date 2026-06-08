@@ -24,6 +24,16 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ── Debug logger (dev only) ───────────────────────────────
+if ((process.env.NODE_ENV || 'development') === 'development') {
+  app.use((req, res, next) => {
+    if (req.method !== 'GET') {
+      console.log(`📩 ${req.method} ${req.originalUrl}`, JSON.stringify(req.body || {}).slice(0, 300));
+    }
+    next();
+  });
+}
+
 // ── Health check ──────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'woody-backend', time: new Date().toISOString() });
