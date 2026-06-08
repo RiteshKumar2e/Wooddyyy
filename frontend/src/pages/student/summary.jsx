@@ -1,14 +1,80 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../api';
 
-const stats = [];
-const subjectStatusData = [];
-const recentActivity = [];
-const typeColor = {};
-const typeIcon = {};
-const weekHeat = [];
 const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 export default function Summary() {
+  const [data, setData] = useState({
+    subjects: 0,
+    topics: { total: 0, completed: 0 },
+    overallProgress: 0,
+    quizzesTaken: 0,
+    averageQuizScore: 0,
+    upcomingTopics: [],
+    recentQuizzes: []
+  });
+  const [weekHeat, setWeekHeat] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const res = await api.get('/api/dashboard');
+        setData(res);
+      } catch (err) {
+        console.error('Failed to load summary details:', err);
+      }
+    };
+
+    const fetchProgress = async () => {
+      try {
+        const progressData = await api.get('/api/dashboard/progress');
+        const sumHeat = [0, 0, 0, 0, 0, 0, 0];
+        progressData.forEach(sub => {
+          if (Array.isArray(sub.weeklySessions)) {
+            sub.weeklySessions.forEach((val, idx) => {
+              if (idx < 7) sumHeat[idx] += val;
+            });
+          }
+        });
+        setWeekHeat(sumHeat);
+      } catch (err) {
+        console.error('Failed to aggregate weekly session hours:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+    fetchProgress();
+  }, []);
+
+  const stats = [
+    { label: 'Study Subjects', value: data.subjects, icon: '🌿', color: '#E8F3D6', change: 'active' },
+    { label: 'Completed Chapters', value: `${data.topics.completed}/${data.topics.total}`, icon: '🗺️', color: '#FAF6E9', change: `${data.overallProgress}% overall` },
+    { label: 'Parchment Quizzes', value: data.quizzesTaken, icon: '📝', color: '#FFFDF9', change: `${data.averageQuizScore}% average` },
+    { label: 'Global Progress', value: `${data.overallProgress}%`, icon: '📊', color: '#E3F2FD', change: 'growing' }
+  ];
+
+  const recentActivity = data.recentQuizzes.map((q, idx) => ({
+    id: q._id || idx,
+    type: 'quiz',
+    action: `Took ${q.type} quiz on "${q.subjectName}" — Score: ${q.score}% (${q.correctCount || 0}/${q.totalQuestions || 0} right)`,
+    time: q.completedAt ? new Date(q.completedAt).toLocaleDateString() : 'recently'
+  }));
+
+  const hasActivity = recentActivity.length > 0;
+  const streakDays = data.topics.completed > 0 ? Math.min(7, data.topics.completed) : 0;
+
+  if (loading) {
+    return (
+      <div className="summary-panel text-center py-12">
+        <span className="spinner-sketch text-4xl">🔄</span>
+        <p className="handwritten text-lg mt-2">Opening study logs drawer...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="summary-panel">
       <div className="panel-header">
@@ -22,23 +88,28 @@ export default function Summary() {
           <div className="streak-flame-wrapper">
             <span className="flame-large">🔥</span>
             <div className="streak-count-box">
-              <span className="streak-num">0</span>
-              <span className="streak-days-label">day streak</span>
+              <span className="streak-num">{streakDays}</span>
+              <span className="streak-days-label">{streakDays === 1 ? 'day streak' : 'days streak'}</span>
             </div>
           </div>
           
           <div className="streak-details">
-            <h3 className="font-bold text-base">No active streak yet</h3>
-            <p className="text-xs text-gray-500">Start using the workspace to build a progress streak.</p>
+            <h3 className="font-bold text-base">
+              {streakDays > 0 ? 'Your focus ember is glowing! 🌿' : 'No active streak yet'}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {streakDays > 0 ? 'Keep checking off study chapters daily to grow your forest.' : 'Start checking off chapters in your Study Plan to light the focus fire.'}
+            </p>
             
             {/* Week Check-offs */}
             <div className="week-checks-row mt-3">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => {
+                const checked = idx < streakDays;
                 return (
                   <div key={day} className="day-check-item">
                     <span className="day-check-label text-xxs font-bold">{day}</span>
-                    <div className="day-check-dot sketch-border-sm">
-                      
+                    <div className={`day-check-dot sketch-border-sm ${checked ? 'checked' : ''}`}>
+                      {checked && '✓'}
                     </div>
                   </div>
                 );
@@ -50,11 +121,6 @@ export default function Summary() {
 
       {/* Stats Row */}
       <div className="stats-row">
-        {stats.length === 0 && (
-          <div className="empty-summary-card sketch-border-sm">
-            No summary data yet. Add study activity to populate this dashboard.
-          </div>
-        )}
         {stats.map((s, i) => (
           <div key={i} className="stat-card sketch-border sketch-shadow" style={{ '--card-color': s.color }}>
             <div className="stat-icon-bg" style={{ backgroundColor: s.color }}>
@@ -69,33 +135,42 @@ export default function Summary() {
         ))}
       </div>
 
-      {/* In which subject what is ongoing vs completed */}
+      {/* Upcoming Chapters List */}
       <div className="subject-milestones-card sketch-border sketch-shadow">
-        <h3 className="card-section-title">📂 Subject Milestones (Ongoing vs Completed)</h3>
-        <p className="text-xs text-gray-500 mb-4">No subject data yet. Add chapters in Study Plan to see milestones here.</p>
-        <div className="empty-summary-card sketch-border-sm">Subject milestones will appear after you add study topics.</div>
+        <h3 className="card-section-title">📅 Upcoming Study Branches</h3>
+        {data.upcomingTopics.length === 0 ? (
+          <div className="empty-summary-card sketch-border-sm">No upcoming branches. You're all caught up! 🌿</div>
+        ) : (
+          <ul className="upcoming-list" style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', padding: 0 }}>
+            {data.upcomingTopics.map(t => (
+              <li key={t._id} className="upcoming-item sketch-border-sm" style={{ background: 'var(--wood-bg)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1.5px solid var(--wood-ink)' }}>
+                <div>
+                  <span className="font-bold text-sm">🌿 {t.title}</span>
+                  {t.date && <span className="meta-badge date-badge" style={{ marginLeft: '12px', fontSize: '11px', background: 'var(--wood-card)', border: '1px solid var(--wood-ink)', padding: '2px 6px', borderRadius: '4px' }}>📅 {t.date}</span>}
+                </div>
+                <span className="handwritten text-xs" style={{ color: 'var(--wood-primary-hover)', fontWeight: 'bold' }}>pending review</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="summary-bottom-grid">
         {/* Weekly Activity Heatmap */}
         <div className="heatmap-card sketch-border sketch-shadow">
           <h3 className="card-section-title">This Week's Focus Heat</h3>
-          {weekHeat.length === 0 ? (
-            <div className="empty-summary-card sketch-border-sm">No weekly activity yet.</div>
-          ) : (
           <div className="heatmap-row">
             {weekHeat.map((val, i) => (
               <div key={i} className="heatmap-col">
                 <div
                   className="heat-bar sketch-border-sm"
-                  style={{ height: `${val * 12}px`, backgroundColor: val > 4 ? '#E6A817' : val > 2 ? '#FDF2CC' : '#F5F0E0' }}
+                  style={{ height: `${Math.min(80, Math.max(10, val * 12))}px`, backgroundColor: val > 4 ? '#E6A817' : val > 0 ? '#FDF2CC' : '#F5F0E0' }}
                   title={`${val}h on ${days[i]}`}
                 ></div>
                 <span className="heat-day">{days[i]}</span>
               </div>
             ))}
           </div>
-          )}
           <div className="heatmap-legend">
             <span className="legend-dot" style={{ background: '#F5F0E0' }}></span> Low
             <span className="legend-dot ml-2" style={{ background: '#FDF2CC' }}></span> Mid
@@ -106,20 +181,20 @@ export default function Summary() {
         {/* Recent Activity Feed */}
         <div className="activity-card sketch-border sketch-shadow">
           <h3 className="card-section-title">Recent Desk Activity</h3>
-          {recentActivity.length === 0 ? (
-            <div className="empty-summary-card sketch-border-sm">Nothing logged yet.</div>
+          {!hasActivity ? (
+            <div className="empty-summary-card sketch-border-sm">Nothing logged yet. Complete quizzes to fill activity logs.</div>
           ) : (
-          <ul className="activity-list">
-            {recentActivity.map((a, i) => (
-              <li key={i} className="activity-item sketch-border-sm" style={{ borderLeft: `4px solid ${typeColor[a.type]}` }}>
-                <span className="activity-icon">{typeIcon[a.type]}</span>
-                <div className="activity-body">
-                  <p className="activity-action">{a.action}</p>
-                  <span className="activity-time">{a.time}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
+            <ul className="activity-list" style={{ padding: 0 }}>
+              {recentActivity.map((a) => (
+                <li key={a.id} className="activity-item sketch-border-sm" style={{ borderLeft: '4px solid var(--wood-accent)' }}>
+                  <span className="activity-icon">📝</span>
+                  <div className="activity-body">
+                    <p className="activity-action">{a.action}</p>
+                    <span className="activity-time">{a.time}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>
@@ -144,7 +219,7 @@ export default function Summary() {
         .week-checks-row { display: flex; gap: 10px; }
         @media (max-width: 600px) { .week-checks-row { justify-content: center; } }
         .day-check-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .day-check-dot { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: var(--wood-bg); border-radius: 4px; font-weight: bold; font-size: 12px; }
+        .day-check-dot { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: var(--wood-bg); border-radius: 4px; font-weight: bold; font-size: 12px; border: 1.5px solid var(--wood-ink); }
         .day-check-dot.checked { background: var(--wood-primary); color: var(--wood-ink); }
 
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; }
@@ -156,18 +231,7 @@ export default function Summary() {
         .stat-change { font-size: 11px; color: #2e7d32; font-weight: 600; margin-top: 2px; }
         
         .subject-milestones-card { background: var(--wood-card); padding: 24px; }
-        .subject-milestones-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        @media (max-width: 800px) { .subject-milestones-grid { grid-template-columns: 1fr; } }
         
-        .subject-milestone-column { background: var(--wood-bg); padding: 16px; display: flex; flex-direction: column; }
-        .milestone-block { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-        .bg-yellow-soft { background: #FFFDE7; }
-        .bg-sage-soft { background: #E8F3D6; }
-        .milestone-badge { font-size: 10px; font-family: var(--heading); font-weight: bold; color: var(--wood-ink); border: 1px solid var(--wood-ink); padding: 1px 6px; border-radius: 4px; align-self: flex-start; text-transform: uppercase; }
-        .bg-orange { background: #FFE082; }
-        .bg-green { background: #A5D6A7; }
-        .milestone-list { list-style: none; display: flex; flex-direction: column; gap: 4px; padding-left: 2px; }
-
         .summary-bottom-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 22px; }
         @media (max-width: 800px) { .summary-bottom-grid { grid-template-columns: 1fr; } }
         .heatmap-card, .activity-card { background: var(--wood-card); padding: 24px; }

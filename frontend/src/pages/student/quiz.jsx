@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { api } from '../../api';
 import '../../styles/student/quiz.css';
 
 export default function Quiz() {
@@ -10,6 +11,7 @@ export default function Quiz() {
   const [generateStep, setGenerateStep] = useState('');
   const [quizType, setQuizType] = useState('objective'); // 'objective' or 'subjective'
   const [subjectFilter, setSubjectFilter] = useState('All');
+  const [subjects, setSubjects] = useState([]);
 
   // Quiz running States
   const [quizQuestions, setQuizQuestions] = useState([]);
@@ -25,6 +27,19 @@ export default function Quiz() {
   // Results
   const [answeredRecords, setAnsweredRecords] = useState([]); // Array of { qId, correct, selection, selfGrade, subjectiveAnswer }
   const [quizCompleted, setQuizCompleted] = useState(false);
+
+  // Load subjects for config scope on mount
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const data = await api.get('/api/subjects');
+        setSubjects(data);
+      } catch (err) {
+        console.error('Failed to load quiz setup subjects:', err);
+      }
+    };
+    fetchSubjects();
+  }, []);
 
   // Setup timers
   useEffect(() => {
@@ -77,49 +92,140 @@ export default function Quiz() {
     setFileUploaded(true);
   };
 
-  // Question generator
-  const triggerGeneration = () => {
-    if (!fileUploaded) {
-      setQuizQuestions([]);
-      setSetupMode(true);
-      return;
-    }
-
+  // Question generator (uses actual database topics!)
+  const triggerGeneration = async () => {
     setGenerating(true);
-    setGenerateStep('Opening file binder... 📁');
-    setTimeout(() => {
-      setGenerateStep('Jotting down parsed topics & formulas... 📝');
-      setTimeout(() => {
-        setGenerateStep('Carving custom choices and solution rubrics... 🌿');
-        setTimeout(() => {
-          const generatedQuestion = quizType === 'objective'
-            ? {
-                id: 998,
-                subject: subjectFilter === 'All' ? 'Uploaded File' : subjectFilter,
-                question: `Your uploaded file, ${fileName.substring(0, 10)}, is ready for a real quiz generator. Connect a question source to continue.`,
-                options: ['Upload a source', 'Add more notes', 'Connect a generator', 'Create my own quiz'],
-                correct: 0,
-                explanation: 'No built-in question bank is loaded. This question is based on your uploaded content only.'
-              }
-            : {
-                id: 999,
-                subject: subjectFilter === 'All' ? 'Uploaded File' : subjectFilter,
-                question: `Your uploaded file, ${fileName.substring(0, 10)}, is ready for a real quiz generator. Connect a question source to continue.`,
-                sampleAnswer: '',
-                explanation: 'No reference answer is prefilled. Add your own response after upload.'
-              };
+    setGenerateStep('Opening study log folders... 📁');
+    
+    try {
+      // Fetch topics from backend based on subject scope
+      const url = subjectFilter === 'All' ? '/api/topics' : `/api/topics?subject=${subjectFilter}`;
+      const topics = await api.get(url);
 
-          setQuizQuestions([generatedQuestion]);
-          setCurrentIndex(0);
-          setSelectedOption(null);
-          setSubjectiveInput('');
-          setAnsweredRecords([]);
-          setShowAnswerFeedback(false);
-          setGenerating(false);
-          setSetupMode(false);
-        }, 1200);
-      }, 1200);
-    }, 1200);
+      setTimeout(() => {
+        setGenerateStep('Jotting down parsed topics & formulas... 📝');
+        setTimeout(() => {
+          setGenerateStep('Carving custom choices and solution rubrics... 🌿');
+          setTimeout(() => {
+            
+            // Build questions dynamically from topics
+            let generated = topics.map((t) => {
+              if (quizType === 'objective') {
+                return {
+                  id: t._id,
+                  subject: t.subject?.name || 'General',
+                  question: `Regarding the study topic "${t.title}": Which of the following options represents your notes or best description?`,
+                  options: [
+                    t.notes || 'No description notes added yet.',
+                    'This chapter is completed and ready for final revision.',
+                    'I need to spend more study hours on this branch.',
+                    'Review flashcards and equations on this concept.'
+                  ],
+                  correct: 0,
+                  explanation: `This question evaluates your custom study branch: "${t.title}" (Notes: ${t.notes || 'None'})`
+                };
+              } else {
+                return {
+                  id: t._id,
+                  subject: t.subject?.name || 'General',
+                  question: `Explain the core concepts, takeaways, and equations relating to your study branch: "${t.title}".`,
+                  sampleAnswer: t.notes || 'No reference note is prefilled.',
+                  explanation: `Self-evaluate your answer based on your study plan notes: "${t.notes || 'None'}"`
+                };
+              }
+            });
+
+            // If no topics exist, fall back to mock questions so they can play
+            if (generated.length === 0) {
+              if (quizType === 'objective') {
+                generated = [
+                  {
+                    id: 'mock-obj-1',
+                    subject: 'Mindful Cabin',
+                    question: 'What is the recommended length of study focus sessions in Woody?',
+                    options: ['10 minutes', '25 minutes (Pomodoro)', '45 minutes', '2 hours straight'],
+                    correct: 2,
+                    explanation: 'Woody recommends 45 minutes of mindful focus blocks, followed by stretching or stepping outside.'
+                  },
+                  {
+                    id: 'mock-obj-2',
+                    subject: 'Mindful Cabin',
+                    question: 'What happens when you complete syllabus branches in Study Plan?',
+                    options: ['Nothing', 'Seeds in your Progress Nursery grow', 'Timer gets faster', 'Sound gets louder'],
+                    correct: 1,
+                    explanation: 'Checking off syllabus branches feeds your seedling, letting it blossom into a mighty green tree!'
+                  }
+                ];
+              } else {
+                generated = [
+                  {
+                    id: 'mock-sub-1',
+                    subject: 'Mindful Cabin',
+                    question: 'Describe your study habits and how you plan to manage focus hours this week in the cabin.',
+                    sampleAnswer: 'Scheduling regular blocks, using the Hourglass Timetable, and reviewing flashcards.',
+                    explanation: 'Self-evaluate based on how mindfully you block your slots and rest.'
+                  }
+                ];
+              }
+            }
+
+            setQuizQuestions(generated);
+            setCurrentIndex(0);
+            setSelectedOption(null);
+            setSubjectiveInput('');
+            setAnsweredRecords([]);
+            setShowAnswerFeedback(false);
+            setGenerating(false);
+            setSetupMode(false);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    } catch (err) {
+      console.error('Failed to generate quiz questions:', err);
+      setGenerating(false);
+    }
+  };
+
+  const saveQuizToBackend = async (records) => {
+    try {
+      const answersPayload = quizQuestions.map((q) => {
+        const rec = records.find(r => r.questionId === q.id) || {};
+        if (quizType === 'objective') {
+          return {
+            selection: rec.selection,
+            timeout: rec.timeout || false
+          };
+        } else {
+          return {
+            subjectiveAnswer: rec.subjectiveAnswer || '',
+            selfGrade: rec.selfGrade || 'missed'
+          };
+        }
+      });
+
+      const activeSubObj = subjects.find(s => s._id === subjectFilter);
+      const subjectId = activeSubObj ? activeSubObj._id : null;
+      const subjectName = activeSubObj ? activeSubObj.name : (fileName ? `File: ${fileName}` : 'General');
+
+      const payload = {
+        subject: subjectId,
+        subjectName,
+        title: fileName ? `Quiz: ${fileName}` : `Mindful ${quizType === 'objective' ? 'Objective' : 'Subjective'} Assessment`,
+        type: quizType,
+        questions: quizQuestions.map(q => ({
+          question: q.question,
+          options: q.options || [],
+          correct: q.correct ?? 0,
+          explanation: q.explanation || '',
+          sampleAnswer: q.sampleAnswer || ''
+        })),
+        answers: answersPayload
+      };
+
+      await api.post('/api/quizzes', payload);
+    } catch (err) {
+      console.error('Failed to save quiz results:', err);
+    }
   };
 
   // Select option for Objective
@@ -147,19 +253,30 @@ export default function Quiz() {
   // Grade Subjective self-assessment
   const gradeSubjective = (grade) => {
     const q = quizQuestions[currentIndex];
-    setAnsweredRecords(prev => [...prev, {
+    const newRecord = {
       questionId: q.id,
       subjectiveAnswer: subjectiveInput,
       selfGrade: grade // 'perfect', 'partial', 'missed'
-    }]);
+    };
+    const nextRecords = [...answeredRecords, newRecord];
+    setAnsweredRecords(nextRecords);
 
-    moveToNext();
+    if (currentIndex + 1 >= quizQuestions.length) {
+      setQuizCompleted(true);
+      saveQuizToBackend(nextRecords);
+    } else {
+      setCurrentIndex(prev => prev + 1);
+      setSelectedOption(null);
+      setSubjectiveInput('');
+      setShowAnswerFeedback(false);
+    }
   };
 
   // Go to next question
   const moveToNext = () => {
     if (currentIndex + 1 >= quizQuestions.length) {
       setQuizCompleted(true);
+      saveQuizToBackend(answeredRecords);
     } else {
       setCurrentIndex(prev => prev + 1);
       setSelectedOption(null);
@@ -198,7 +315,7 @@ export default function Quiz() {
       <div className="quiz-panel">
         <div className="panel-header">
           <h2 className="panel-title">📝 Modular Study Cabin Quiz</h2>
-          <p className="panel-subtitle">Upload your own file to build a quiz from your content.</p>
+          <p className="panel-subtitle">Upload your own file or select a study plan scope to build a quiz.</p>
         </div>
 
         {generating ? (
@@ -255,12 +372,13 @@ export default function Quiz() {
                   <label className="config-label">Subject Scope</label>
                   <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)} className="config-select sketch-border-sm">
                     <option value="All">All Subjects</option>
+                    {subjects.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
                   </select>
                 </div>
               </div>
 
               <button onClick={triggerGeneration} className="btn-sketch btn-sketch-primary sketch-border sketch-shadow w-full justify-center mt-6">
-                🔥 Build Quiz From Upload
+                🔥 Build Quiz From Scope
               </button>
             </div>
 
@@ -272,13 +390,11 @@ export default function Quiz() {
 
   // RENDER RESULTS PANEL
   if (quizCompleted) {
-    // Math indicators
     const totalQ = quizQuestions.length;
     let rightCount = 0;
     let wrongCount = 0;
     let timeoutCount = 0;
     
-    // Subjective counts
     let perfectCount = 0;
     let partialCount = 0;
     let missedCount = 0;
@@ -347,7 +463,7 @@ export default function Quiz() {
           {/* Details list of each question with correct answers */}
           <div className="results-review-section">
             <h3 className="font-bold text-base mb-3 border-bottom pb-2">📋 Details Review</h3>
-            <ul className="results-review-list">
+            <ul className="results-review-list" style={{ padding: 0 }}>
               {quizQuestions.map((q, idx) => {
                 const record = answeredRecords.find(r => r.questionId === q.id) || {};
                 return (
@@ -405,9 +521,11 @@ export default function Quiz() {
                         </p>
                       </div>
                     )}
-                    <p className="text-xs italic text-gray-500 mt-2 bg-yellow-soft p-2 sketch-border-sm">
-                      ✏️ <span className="font-bold">Explanation:</span> {q.explanation}
-                    </p>
+                    {q.explanation && (
+                      <p className="text-xs italic text-gray-500 mt-2 bg-yellow-soft p-2 sketch-border-sm">
+                        ✏️ <span className="font-bold">Explanation:</span> {q.explanation}
+                      </p>
+                    )}
                   </li>
                 );
               })}
@@ -430,11 +548,11 @@ export default function Quiz() {
       <div className="quiz-panel">
         <div className="panel-header">
           <h2 className="panel-title">📝 Parchment Active Assessment</h2>
-          <p className="panel-subtitle">Upload your own file to start a quiz. No bundled question data is shown here.</p>
+          <p className="panel-subtitle">Start a quiz by selecting subject scope in setup.</p>
         </div>
         <div className="quiz-empty-state sketch-border sketch-shadow">
           <p className="handwritten text-xl">No quiz content yet.</p>
-          <p className="text-sm mt-2">Upload a syllabus or notes file above to generate your own questions.</p>
+          <p className="text-sm mt-2">Select a subject scope or upload a file above to generate your own questions.</p>
         </div>
       </div>
     );

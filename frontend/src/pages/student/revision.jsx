@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import '../../styles/student/revision.css';
-
-const initialNotes = [];
+import React, { useState, useEffect } from 'react';
+import { api } from '../../api';
 
 const tags = ['all', 'must-revise', 'tricky', 'formula'];
 const colors = { yellow: 'var(--note-yellow)', pink: 'var(--note-pink)', green: 'var(--note-green)' };
 const tagColors = { 'must-revise': '#FFE082', tricky: '#FFAB91', formula: '#A5D6A7' };
 
 export default function Revision() {
-  const [notes, setNotes] = useState(initialNotes);
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeTag, setActiveTag] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [viewMode, setViewMode] = useState('deck'); // 'deck' or 'subject-wise'
@@ -30,23 +29,71 @@ export default function Revision() {
   const [flipped, setFlipped] = useState({});
   const [activeResourcePreview, setActiveResourcePreview] = useState(null); // resource file preview name
 
+  // Fetch all revision notes on mount
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const data = await api.get('/api/revision');
+        setNotes(data.map(n => ({
+          id: n._id,
+          subject: n.subject,
+          keyword: n.keyword,
+          detail: n.detail,
+          tag: n.tag,
+          color: n.color || 'yellow',
+          date: n.date || '',
+          time: n.time || '',
+          resource: n.resource || 'None'
+        })));
+      } catch (err) {
+        console.error('Failed to load revision notes:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotes();
+  }, []);
+
   const filtered = activeTag === 'all' ? notes : notes.filter(n => n.tag === activeTag);
 
   const toggleFlip = (id) => setFlipped(f => ({ ...f, [id]: !f[id] }));
 
-  const addNote = (e) => {
+  const addNote = async (e) => {
     e.preventDefault();
     if (!form.keyword || !form.detail || !form.subject) return;
-    const finalForm = { ...form, id: Date.now(), resource: selectedFileMock || 'None' };
-    setNotes([...notes, finalForm]);
-    setForm({ subject: '', keyword: '', detail: '', tag: 'must-revise', color: 'yellow', date: '', time: '', resource: 'None' });
-    setSelectedFileMock('');
-    setShowForm(false);
+    try {
+      const body = {
+        ...form,
+        resource: selectedFileMock || 'None'
+      };
+      const created = await api.post('/api/revision', body);
+      setNotes(prev => [...prev, {
+        id: created._id,
+        subject: created.subject,
+        keyword: created.keyword,
+        detail: created.detail,
+        tag: created.tag,
+        color: created.color || 'yellow',
+        date: created.date || '',
+        time: created.time || '',
+        resource: created.resource || 'None'
+      }]);
+      setForm({ subject: '', keyword: '', detail: '', tag: 'must-revise', color: 'yellow', date: '', time: '', resource: 'None' });
+      setSelectedFileMock('');
+      setShowForm(false);
+    } catch (err) {
+      console.error('Failed to create revision note:', err);
+    }
   };
 
-  const deleteNote = (id, e) => {
+  const deleteNote = async (id, e) => {
     e.stopPropagation();
-    setNotes(notes.filter(n => n.id !== id));
+    try {
+      await api.delete(`/api/revision/${id}`);
+      setNotes(prev => prev.filter(n => n.id !== id));
+    } catch (err) {
+      console.error('Failed to delete revision card:', err);
+    }
   };
 
   const groupSubjectWise = () => {
@@ -67,6 +114,15 @@ export default function Revision() {
   };
 
   const groupedNotes = groupSubjectWise();
+
+  if (loading) {
+    return (
+      <div className="revision-panel text-center py-12">
+        <span className="spinner-sketch text-4xl">🔄</span>
+        <p className="handwritten text-lg mt-2">Opening flashcard cabinet drawer...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="revision-panel">
@@ -111,9 +167,8 @@ export default function Revision() {
             <div className="mock-file-content sketch-border-sm mt-3">
               <p className="text-xxs font-bold text-gray-500 uppercase border-bottom pb-1">Milestone Highlights</p>
               <ul className="text-left text-xs list-disc pl-4 mt-2 leading-relaxed">
-                <li>No attached resource is loaded yet.</li>
-                <li>Upload a resource to see a preview.</li>
-                <li>Add your own revision notes to build the deck.</li>
+                <li>Associated file: {activeResourcePreview}</li>
+                <li>Ready for active retrieval.</li>
               </ul>
             </div>
           </div>
@@ -164,7 +219,7 @@ export default function Revision() {
             </div>
             <div className="form-group">
               <label className="form-label">Target Time *</label>
-              <input value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} placeholder="Target time" className="form-input sketch-border-sm" required />
+              <input value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} placeholder="e.g. 4:00 PM" className="form-input sketch-border-sm" required />
             </div>
             <div className="form-group">
               <label className="form-label">Tag</label>
@@ -189,13 +244,13 @@ export default function Revision() {
             <div key={n.id} className={`flashcard-wrap ${flipped[n.id] ? 'is-flipped' : ''}`} onClick={() => toggleFlip(n.id)}>
               <div className="flashcard-inner">
                 {/* Front */}
-                <div className="flashcard-face flashcard-front sketch-border sketch-shadow" style={{ background: colors[n.color] }}>
+                <div className="flashcard-face flashcard-front sketch-border sketch-shadow" style={{ background: colors[n.color] || 'var(--note-yellow)' }}>
                   <div className="card-tag-badge" style={{ background: tagColors[n.tag] }}>{n.tag}</div>
                   <div className="card-subject">{n.subject}</div>
                   <h3 className="card-keyword">{n.keyword}</h3>
                   <div className="card-schedule-tag">
-                    <span>📅 {n.date}</span>
-                    <span>⏰ {n.time}</span>
+                    {n.date && <span>📅 {n.date}</span>}
+                    {n.time && <span>⏰ {n.time}</span>}
                   </div>
                   {n.resource && n.resource !== 'None' && (
                     <button onClick={(e) => { e.stopPropagation(); setActiveResourcePreview(n.resource); }} className="card-resource-clip-badge handwritten text-xxs">
@@ -206,7 +261,7 @@ export default function Revision() {
                   <button className="card-delete-btn" onClick={(e) => deleteNote(n.id, e)}>✕</button>
                 </div>
                 {/* Back */}
-                <div className="flashcard-face flashcard-back sketch-border sketch-shadow" style={{ background: colors[n.color] }}>
+                <div className="flashcard-face flashcard-back sketch-border sketch-shadow" style={{ background: colors[n.color] || 'var(--note-yellow)' }}>
                   <div className="card-tag-badge" style={{ background: tagColors[n.tag] }}>{n.tag}</div>
                   <p className="card-detail">{n.detail}</p>
                   <div className="card-schedule-tag text-xs text-gray-500 font-mono mt-4">
@@ -235,7 +290,7 @@ export default function Revision() {
                 <span className="folder-count">{groupedNotes[sub].length} topics</span>
               </div>
               <div className="subject-folder-sheet">
-                <ul className="folder-note-list">
+                <ul className="folder-note-list" style={{ padding: 0 }}>
                   {groupedNotes[sub].map(n => (
                     <li key={n.id} className="folder-note-item sketch-border-sm" style={{ borderLeft: `5px solid ${tagColors[n.tag]}` }}>
                       <div className="note-item-main">
@@ -251,8 +306,8 @@ export default function Revision() {
                         
                         {/* Target revision schedule details in the list item! */}
                         <div className="note-item-schedule-row mt-3 text-xxs font-bold">
-                          <span className="sched-badge border-green">📅 Revision Target Date: {n.date}</span>
-                          <span className="sched-badge border-sky ml-2">⏰ Revision Time: {n.time}</span>
+                          {n.date && <span className="sched-badge border-green">📅 Revision Target Date: {n.date}</span>}
+                          {n.time && <span className="sched-badge border-sky ml-2">⏰ Revision Time: {n.time}</span>}
                         </div>
                       </div>
                       

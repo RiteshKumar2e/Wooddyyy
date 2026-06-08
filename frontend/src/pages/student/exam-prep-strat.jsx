@@ -1,145 +1,5 @@
-import React, { useState } from 'react';
-
-const INITIAL_STRATEGIES = [
-  {
-    id: 'ecology',
-    subject: '🌲 Forest Ecology',
-    color: 'var(--wood-sage)',
-    examDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 5 days from today
-    phases: [
-      {
-        id: 'eco-p1',
-        phase: 'Root Knowledge',
-        weeks: 'Weeks 1-2',
-        tasks: [
-          'Read chapters 1-4 on forest biomes and soil microbiology',
-          'Highlight key definitions of symbiosis and mycorrhizae',
-          'Draw the nitrogen and carbon nutrient cycles by hand'
-        ],
-        done: false
-      },
-      {
-        id: 'eco-p2',
-        phase: 'Canopy Deep-Dive',
-        weeks: 'Weeks 3-4',
-        tasks: [
-          'Review tricky flashcards on plant and tree adaptations',
-          'Take the mid-term practice test on ecosystem equilibrium',
-          'Attend peer study group in the cabin library'
-        ],
-        done: false
-      },
-      {
-        id: 'eco-p3',
-        phase: 'Harvest & Review',
-        weeks: 'Exam Week',
-        tasks: [
-          'Solve 3 past exam essay question papers under timed conditions',
-          'Conduct an active-recall session on all handwritten charts',
-          'Get a full night of restful sleep before exam day ☕'
-        ],
-        done: false
-      }
-    ],
-    tips: [
-      'Study in 45-minute blocks, then step outside to look at real green leaves to rest your eyes.',
-      'Draw connections between topics as branching trees—it assists visual memory.',
-      'Explain the nitrogen cycle aloud to your pet or a plush toy to test your teaching flow.'
-    ]
-  },
-  {
-    id: 'physics',
-    subject: '🍃 Acoustic Physics',
-    color: '#F4A261', // var(--wood-clay) equivalent
-    examDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 12 days from today
-    phases: [
-      {
-        id: 'phys-p1',
-        phase: 'Wave Mechanics Foundation',
-        weeks: 'Weeks 1-2',
-        tasks: [
-          'Derive core formulas for sound wave propagation and velocity',
-          'Solve 20 fundamental mechanics questions on harmonics',
-          'Visualize wave interference and superposition patterns'
-        ],
-        done: false
-      },
-      {
-        id: 'phys-p2',
-        phase: 'Resonance & Resonance Decay',
-        weeks: 'Weeks 3-4',
-        tasks: [
-          'Analyze acoustic properties of string and wind instruments',
-          'Complete the mid-term mock acoustic assessment',
-          'Create a single-page cheatsheet of wave equations'
-        ],
-        done: false
-      },
-      {
-        id: 'phys-p3',
-        phase: 'Final Tuning',
-        weeks: 'Exam Week',
-        tasks: [
-          'Review the physics formulas in the Revision Desk deck',
-          'Re-solve all incorrect homework questions from the semester',
-          'Relax, clear your mind, and listen to cozy ambient soundscapes'
-        ],
-        done: false
-      }
-    ],
-    tips: [
-      'Try listening to instrumental acoustic guitar music while solving equation sets.',
-      'Remember: frequency is the heartbeat of sound. Keep your study frequency steady!',
-      'Formulas are easier to remember if you understand the physical relationship they describe.'
-    ]
-  },
-  {
-    id: 'literature',
-    subject: '📜 Medieval Literature',
-    color: 'var(--wood-accent)',
-    examDate: new Date(Date.now() + 19 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 19 days from today
-    phases: [
-      {
-        id: 'lit-p1',
-        phase: 'Manuscript Reading',
-        weeks: 'Weeks 1-2',
-        tasks: [
-          'Finish reading "Beowulf" and "The Canterbury Tales"',
-          'Take detailed notes on recurring archetypes and epic themes',
-          'Research the socio-political context of 14th-century writers'
-        ],
-        done: false
-      },
-      {
-        id: 'lit-p2',
-        phase: 'Thematic Analysis',
-        weeks: 'Weeks 3-4',
-        tasks: [
-          'Write 3 short outlines comparing chivalry and courtly love',
-          'Discuss major literary themes with peers or in a study forum',
-          'Review lecture slides on Old and Middle English linguistics'
-        ],
-        done: false
-      },
-      {
-        id: 'lit-p3',
-        phase: 'Scribe\'s Final Review',
-        weeks: 'Exam Week',
-        tasks: [
-          'Memorize key literary quotes for textual support in essays',
-          'Outline essay structures for 5 potential exam prompts',
-          'Do a mock timed writing session to practice pacing'
-        ],
-        done: false
-      }
-    ],
-    tips: [
-      'Write your essay outlines with pen and paper—it feels more medieval and aids memory retention!',
-      'Don\'t just memorize the plot; focus on the *why* behind the characters\' choices.',
-      'Keep a cup of warm tea nearby to stay cozy and focused during long reading sessions.'
-    ]
-  }
-];
+import React, { useState, useEffect } from 'react';
+import { api } from '../../api';
 
 const SWATCHES = ['#E6A817', '#7BA05B', '#C97B5A', '#5A8CA0', '#B05A8C', '#8C7BA0'];
 
@@ -160,8 +20,9 @@ const daysLabel = (d) => {
 };
 
 export default function ExamPrepStrat() {
-  const [strategies, setStrategies] = useState(INITIAL_STRATEGIES);
-  const [activeStrat, setActiveStrat] = useState(INITIAL_STRATEGIES[0]?.id || null);
+  const [strategies, setStrategies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeStrat, setActiveStrat] = useState(null);
 
   // New strategy form
   const [newSubject, setNewSubject] = useState('');
@@ -182,94 +43,165 @@ export default function ExamPrepStrat() {
   const [uploadStatus, setUploadStatus] = useState('');
   const [fileName, setFileName] = useState('');
 
+  // Fetch strategies on mount
+  useEffect(() => {
+    const fetchStrategies = async () => {
+      try {
+        const data = await api.get('/api/strategies');
+        const mapped = data.map(s => ({
+          id: s._id,
+          subject: s.subject,
+          color: s.color,
+          examDate: s.examDate ? s.examDate.split('T')[0] : '',
+          phases: s.phases || [],
+          tips: s.tips || []
+        }));
+        setStrategies(mapped);
+        if (mapped.length > 0) {
+          setActiveStrat(mapped[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to load exam strategies:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStrategies();
+  }, []);
+
   const strat = strategies.find(s => s.id === activeStrat);
   const phases = strat?.phases || [];
   const doneCount = phases.filter(p => p.done).length;
   const overallProgress = phases.length ? Math.round((doneCount / phases.length) * 100) : 0;
 
   // ---- Strategy CRUD ----
-  const addStrategy = (e) => {
+  const addStrategy = async (e) => {
     e.preventDefault();
     if (!newSubject.trim()) return;
-    const id = Date.now();
-    const strategy = {
-      id,
-      subject: newSubject.trim(),
-      color: newColor,
-      examDate: newExamDate,
-      phases: [],
-      tips: [],
-    };
-    setStrategies([...strategies, strategy]);
-    setActiveStrat(id);
-    setNewSubject('');
-    setNewExamDate('');
-    setNewColor(SWATCHES[0]);
+    try {
+      const payload = {
+        subject: newSubject.trim(),
+        color: newColor,
+        examDate: newExamDate || undefined,
+        phases: [],
+        tips: []
+      };
+      const created = await api.post('/api/strategies', payload);
+      const newStrat = {
+        id: created._id,
+        subject: created.subject,
+        color: created.color,
+        examDate: created.examDate ? created.examDate.split('T')[0] : '',
+        phases: created.phases || [],
+        tips: created.tips || []
+      };
+      setStrategies(prev => [...prev, newStrat]);
+      setActiveStrat(newStrat.id);
+      setNewSubject('');
+      setNewExamDate('');
+      setNewColor(SWATCHES[0]);
+    } catch (err) {
+      console.error('Failed to create new exam strategy:', err);
+    }
   };
 
-  const deleteStrategy = (id) => {
-    const remaining = strategies.filter(s => s.id !== id);
-    setStrategies(remaining);
-    if (activeStrat === id) setActiveStrat(remaining[0]?.id ?? null);
+  const deleteStrategy = async (id) => {
+    try {
+      await api.delete(`/api/strategies/${id}`);
+      const remaining = strategies.filter(s => s.id !== id);
+      setStrategies(remaining);
+      if (activeStrat === id) setActiveStrat(remaining[0]?.id ?? null);
+    } catch (err) {
+      console.error('Failed to delete strategy:', err);
+    }
   };
 
   // ---- Phase CRUD ----
-  const updateActive = (updater) => {
-    setStrategies(strategies.map(s => s.id === activeStrat ? updater(s) : s));
-  };
-
-  const addPhase = (e) => {
+  const addPhase = async (e) => {
     e.preventDefault();
     if (!strat || !newPhaseName.trim()) return;
     const tasks = newPhaseTasks
       .split('\n')
       .map(t => t.trim())
       .filter(Boolean);
-    const phase = { id: Date.now(), phase: newPhaseName.trim(), weeks: newPhaseWeeks.trim(), tasks, done: false };
-    updateActive(s => ({ ...s, phases: [...s.phases, phase] }));
-    setNewPhaseName('');
-    setNewPhaseWeeks('');
-    setNewPhaseTasks('');
+    const nextPhases = [...strat.phases, { phase: newPhaseName.trim(), weeks: newPhaseWeeks.trim(), tasks, done: false }];
+    
+    try {
+      const updated = await api.put(`/api/strategies/${activeStrat}`, { phases: nextPhases });
+      setStrategies(prev => prev.map(s => s.id === activeStrat ? { ...s, phases: updated.phases } : s));
+      setNewPhaseName('');
+      setNewPhaseWeeks('');
+      setNewPhaseTasks('');
+    } catch (err) {
+      console.error('Failed to add preparation phase:', err);
+    }
   };
 
-  const togglePhase = (phaseId) => {
-    updateActive(s => ({
-      ...s,
-      phases: s.phases.map(p => p.id === phaseId ? { ...p, done: !p.done } : p),
-    }));
+  const togglePhase = async (phaseId) => {
+    if (!strat) return;
+    try {
+      const updated = await api.patch(`/api/strategies/${activeStrat}/phases/${phaseId}/toggle`);
+      setStrategies(prev => prev.map(s => s.id === activeStrat ? { ...s, phases: updated.phases } : s));
+    } catch (err) {
+      console.error('Failed to toggle phase status:', err);
+    }
   };
 
-  const deletePhase = (phaseId) => {
-    updateActive(s => ({ ...s, phases: s.phases.filter(p => p.id !== phaseId) }));
+  const deletePhase = async (phaseId) => {
+    const nextPhases = strat.phases.filter(p => (p._id || p.id) !== phaseId);
+    try {
+      const updated = await api.put(`/api/strategies/${activeStrat}`, { phases: nextPhases });
+      setStrategies(prev => prev.map(s => s.id === activeStrat ? { ...s, phases: updated.phases } : s));
+    } catch (err) {
+      console.error('Failed to delete phase:', err);
+    }
   };
 
-  const addTask = (phaseId) => {
+  const addTask = async (phaseId) => {
     const value = (taskInputs[phaseId] || '').trim();
     if (!value) return;
-    updateActive(s => ({
-      ...s,
-      phases: s.phases.map(p => p.id === phaseId ? { ...p, tasks: [...p.tasks, value] } : p),
-    }));
-    setTaskInputs({ ...taskInputs, [phaseId]: '' });
+    const nextPhases = strat.phases.map(p => (p._id || p.id) === phaseId ? { ...p, tasks: [...p.tasks, value] } : p);
+    try {
+      const updated = await api.put(`/api/strategies/${activeStrat}`, { phases: nextPhases });
+      setStrategies(prev => prev.map(s => s.id === activeStrat ? { ...s, phases: updated.phases } : s));
+      setTaskInputs({ ...taskInputs, [phaseId]: '' });
+    } catch (err) {
+      console.error('Failed to append task:', err);
+    }
   };
 
-  const deleteTask = (phaseId, taskIdx) => {
-    updateActive(s => ({
-      ...s,
-      phases: s.phases.map(p => p.id === phaseId ? { ...p, tasks: p.tasks.filter((_, i) => i !== taskIdx) } : p),
-    }));
+  const deleteTask = async (phaseId, taskIdx) => {
+    const nextPhases = strat.phases.map(p => (p._id || p.id) === phaseId ? { ...p, tasks: p.tasks.filter((_, i) => i !== taskIdx) } : p);
+    try {
+      const updated = await api.put(`/api/strategies/${activeStrat}`, { phases: nextPhases });
+      setStrategies(prev => prev.map(s => s.id === activeStrat ? { ...s, phases: updated.phases } : s));
+    } catch (err) {
+      console.error('Failed to remove task:', err);
+    }
   };
 
   // ---- Tips CRUD ----
-  const addTip = (e) => {
+  const addTip = async (e) => {
     e.preventDefault();
     if (!strat || !newTip.trim()) return;
-    updateActive(s => ({ ...s, tips: [...s.tips, newTip.trim()] }));
-    setNewTip('');
+    const nextTips = [...strat.tips, newTip.trim()];
+    try {
+      const updated = await api.put(`/api/strategies/${activeStrat}`, { tips: nextTips });
+      setStrategies(prev => prev.map(s => s.id === activeStrat ? { ...s, tips: updated.tips } : s));
+      setNewTip('');
+    } catch (err) {
+      console.error('Failed to post tip:', err);
+    }
   };
 
-  const deleteTip = (idx) => {
-    updateActive(s => ({ ...s, tips: s.tips.filter((_, i) => i !== idx) }));
+  const deleteTip = async (idx) => {
+    const nextTips = strat.tips.filter((_, i) => i !== idx);
+    try {
+      const updated = await api.put(`/api/strategies/${activeStrat}`, { tips: nextTips });
+      setStrategies(prev => prev.map(s => s.id === activeStrat ? { ...s, tips: updated.tips } : s));
+    } catch (err) {
+      console.error('Failed to remove tip:', err);
+    }
   };
 
   // ---- Mock upload parser ----
@@ -291,6 +223,15 @@ export default function ExamPrepStrat() {
       }, 1200);
     }, 1200);
   };
+
+  if (loading) {
+    return (
+      <div className="exam-prep-panel text-center py-12">
+        <span className="spinner-sketch text-4xl">🔄</span>
+        <p className="handwritten text-lg mt-2">Opening exam roadmap ledger...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="exam-prep-panel">
@@ -389,44 +330,47 @@ export default function ExamPrepStrat() {
 
       {/* Phase Roadmap Cards */}
       <div className="phases-timeline">
-        {phases.length ? phases.map((p, idx) => (
-          <div key={p.id} className={`phase-card sketch-border sketch-shadow ${p.done ? 'phase-done' : ''}`}>
-            {idx < phases.length - 1 && <div className="timeline-connector"></div>}
+        {phases.length ? phases.map((p, idx) => {
+          const pId = p._id || p.id;
+          return (
+            <div key={pId} className={`phase-card sketch-border sketch-shadow ${p.done ? 'phase-done' : ''}`}>
+              {idx < phases.length - 1 && <div className="timeline-connector"></div>}
 
-            <div className="phase-header">
-              <div className={`phase-circle sketch-border-sm ${p.done ? 'phase-circle-done' : ''}`} onClick={() => togglePhase(p.id)}>
-                {p.done
-                  ? <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#2D2C24" strokeWidth="2.5" strokeLinecap="round" /></svg>
-                  : <span className="phase-num">{idx + 1}</span>
-                }
+              <div className="phase-header">
+                <div className={`phase-circle sketch-border-sm ${p.done ? 'phase-circle-done' : ''}`} onClick={() => togglePhase(pId)}>
+                  {p.done
+                    ? <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#2D2C24" strokeWidth="2.5" strokeLinecap="round" /></svg>
+                    : <span className="phase-num">{idx + 1}</span>
+                  }
+                </div>
+                <div className="phase-title-block" onClick={() => togglePhase(pId)}>
+                  <h4 className="phase-name">{p.phase}</h4>
+                  {p.weeks && <span className="phase-weeks handwritten">{p.weeks}</span>}
+                </div>
+                <span className="phase-toggle-btn" onClick={() => togglePhase(pId)}>{p.done ? '✅ Done' : '○ Mark Done'}</span>
+                <button className="phase-del-btn" onClick={() => deletePhase(pId)} aria-label="delete phase">🗑️</button>
               </div>
-              <div className="phase-title-block" onClick={() => togglePhase(p.id)}>
-                <h4 className="phase-name">{p.phase}</h4>
-                {p.weeks && <span className="phase-weeks handwritten">{p.weeks}</span>}
-              </div>
-              <span className="phase-toggle-btn" onClick={() => togglePhase(p.id)}>{p.done ? '✅ Done' : '○ Mark Done'}</span>
-              <button className="phase-del-btn" onClick={() => deletePhase(p.id)} aria-label="delete phase">🗑️</button>
-            </div>
 
-            <ul className="phase-tasks">
-              {p.tasks.map((t, ti) => (
-                <li key={ti} className="phase-task-item sketch-border-sm">
-                  <span className="task-bullet" style={{ background: strat?.color || 'var(--wood-accent)' }}></span>
-                  <span className="task-text">{t}</span>
-                  <button className="task-del" onClick={() => deleteTask(p.id, ti)} aria-label="delete task">✕</button>
+              <ul className="phase-tasks">
+                {p.tasks.map((t, ti) => (
+                  <li key={ti} className="phase-task-item sketch-border-sm">
+                    <span className="task-bullet" style={{ background: strat?.color || 'var(--wood-accent)' }}></span>
+                    <span className="task-text">{t}</span>
+                    <button className="task-del" onClick={() => deleteTask(pId, ti)} aria-label="delete task">✕</button>
+                  </li>
+                ))}
+                <li className="phase-task-add">
+                  <input
+                    value={taskInputs[pId] || ''}
+                    onChange={e => setTaskInputs({ ...taskInputs, [pId]: e.target.value })}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTask(pId); } }}
+                    placeholder="Add a task…" className="form-input sketch-border-sm task-add-input" />
+                  <button type="button" className="task-add-btn sketch-border-sm" onClick={() => addTask(pId)}>+ Add</button>
                 </li>
-              ))}
-              <li className="phase-task-add">
-                <input
-                  value={taskInputs[p.id] || ''}
-                  onChange={e => setTaskInputs({ ...taskInputs, [p.id]: e.target.value })}
-                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTask(p.id); } }}
-                  placeholder="Add a task…" className="form-input sketch-border-sm task-add-input" />
-                <button type="button" className="task-add-btn sketch-border-sm" onClick={() => addTask(p.id)}>+ Add</button>
-              </li>
-            </ul>
-          </div>
-        )) : <div className="exam-empty sketch-border-sm">{strat ? 'No phases yet — add one below.' : 'Select or add a strategy to see phases.'}</div>}
+              </ul>
+            </div>
+          );
+        }) : <div className="exam-empty sketch-border-sm">{strat ? 'No phases yet — add one below.' : 'Select or add a strategy to see phases.'}</div>}
       </div>
 
       {/* Add Phase Form */}

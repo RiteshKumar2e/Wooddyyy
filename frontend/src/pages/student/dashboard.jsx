@@ -10,6 +10,7 @@ import ProgressChart from './progress-chart.jsx';
 import ExamPrepStrat from './exam-prep-strat.jsx';
 import TimeTable from './time-table.jsx';
 import Profile from './profile.jsx';
+import { api } from '../../api';
 
 const defaultProfile = {
   fullName: '',
@@ -31,40 +32,31 @@ const navItems = [
   { id: 'profile',  label: 'Profile',            icon: '👤', emoji: true },
 ];
 
-const componentMap = {
-  welcome:   <WelcomeCard userName="Woody" />,
-  summary:   <Summary />,
-  studyplan: <StudyPlan />,
-  revision:  <Revision />,
-  quiz:      <Quiz />,
-  progress:  <ProgressChart />,
-  examprep:  <ExamPrepStrat />,
-  timetable: <TimeTable />,
-};
-
-export default function Dashboard() {
+export default function Dashboard({ onLogout, user, onUserUpdate }) {
   const [active, setActive] = useState('welcome');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profile, setProfile] = useState(defaultProfile);
 
   useEffect(() => {
-    try {
-      const storedProfile = window.localStorage.getItem('woody-profile');
-      if (storedProfile) {
-        setProfile({ ...defaultProfile, ...JSON.parse(storedProfile) });
-      }
-    } catch {
-      setProfile(defaultProfile);
+    if (user) {
+      setProfile({
+        fullName: user.fullName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        goal: user.goal || '',
+        timezone: user.timezone || '',
+      });
     }
-  }, []);
+  }, [user]);
 
-  const handleProfileSave = (nextProfile) => {
-    const mergedProfile = { ...defaultProfile, ...nextProfile };
-    setProfile(mergedProfile);
+  const handleProfileSave = async (nextProfile) => {
     try {
-      window.localStorage.setItem('woody-profile', JSON.stringify(mergedProfile));
-    } catch {
-      // Ignore storage failures and keep the session state working.
+      const data = await api.put('/api/auth/me', nextProfile);
+      if (onUserUpdate) onUserUpdate(data.user);
+    } catch (err) {
+      console.error('Failed to sync profile change with database:', err);
+      // fallback to state-only save
+      setProfile(nextProfile);
     }
   };
 
@@ -80,6 +72,7 @@ export default function Dashboard() {
         active={active} 
         setActive={setActive} 
         navItems={navItems} 
+        onLogout={onLogout}
       />
 
       {/* ─── MAIN CONTENT ────────────────────────────────────────── */}
@@ -131,14 +124,18 @@ export default function Dashboard() {
 
         {/* Page Content */}
         <div className="dash-content">
-          {active === 'profile'
-            ? <Profile profile={profile} onSave={handleProfileSave} />
-            : active === 'welcome'
-              ? <WelcomeCard userName={displayName} />
-              : componentMap[active]
-          }
+          {active === 'profile'   && <Profile profile={profile} onSave={handleProfileSave} />}
+          {active === 'welcome'   && <WelcomeCard userName={displayName} />}
+          {active === 'summary'   && <Summary />}
+          {active === 'studyplan' && <StudyPlan />}
+          {active === 'revision'  && <Revision />}
+          {active === 'quiz'      && <Quiz />}
+          {active === 'progress'  && <ProgressChart />}
+          {active === 'examprep'  && <ExamPrepStrat />}
+          {active === 'timetable' && <TimeTable />}
         </div>
       </main>
     </div>
   );
 }
+

@@ -1,14 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../api';
 import '../../styles/student/progress-chart.css';
-
-const subjectData = [];
 
 const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const maxSessions = 7;
 
 export default function ProgressChart() {
+  const [subjectData, setSubjectData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeSubject, setActiveSubject] = useState(null);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const data = await api.get('/api/dashboard/progress');
+        setSubjectData(data.map(s => ({
+          name: s.name,
+          color: s.color,
+          total: s.total || 0,
+          completed: s.completed || 0,
+          progress: s.progress || 0,
+          quizAvg: s.quizAvg || 0,
+          sessions: s.weeklySessions || [0, 0, 0, 0, 0, 0, 0],
+          chapters: s.chapters || []
+        })));
+      } catch (err) {
+        console.error('Failed to load nursery progress data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProgress();
+  }, []);
+
   const displayed = activeSubject ? subjectData.filter(s => s.name === activeSubject) : subjectData;
+
+  if (loading) {
+    return (
+      <div className="progress-panel text-center py-12">
+        <span className="spinner-sketch text-4xl">🔄</span>
+        <p className="handwritten text-lg mt-2">Checking Progress Nursery logs...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="progress-panel">
@@ -21,7 +55,7 @@ export default function ProgressChart() {
       <div className="subject-pills">
         <button onClick={() => setActiveSubject(null)} className={`pill-btn sketch-border-sm ${!activeSubject ? 'pill-active' : ''}`}>All Subjects</button>
         {subjectData.length === 0 ? (
-          <span className="progress-empty handwriting">No subjects added yet.</span>
+          <span className="progress-empty handwriting">No subjects added yet. Add branches in Study Plan!</span>
         ) : subjectData.map(s => (
           <button key={s.name} onClick={() => setActiveSubject(s.name === activeSubject ? null : s.name)}
             className={`pill-btn sketch-border-sm ${activeSubject === s.name ? 'pill-active' : ''}`}
@@ -38,7 +72,7 @@ export default function ProgressChart() {
         ) : displayed.map(s => {
           const r = 46;
           const circ = 2 * Math.PI * r;
-          const pct = Math.round((s.completed / s.total) * 100);
+          const pct = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
           const studied = (pct / 100) * circ;
           
           return (
@@ -63,9 +97,11 @@ export default function ProgressChart() {
                 {/* Chapter Checklist tracker inside card! */}
                 <div className="ring-card-chapters-checklist sketch-border-sm mt-3">
                   <p className="checklist-title font-bold text-xxs border-bottom pb-1 mb-2">Chapters Tracking</p>
-                  <ul className="checklist-items-list text-xxs">
-                    {s.chapters.map((ch, idx) => (
-                      <li key={idx} className={ch.done ? 'checked-item' : 'unchecked-item'}>
+                  <ul className="checklist-items-list text-xxs" style={{ padding: 0, listStyle: 'none' }}>
+                    {s.chapters.length === 0 ? (
+                      <li className="unchecked-item">No chapters added yet</li>
+                    ) : s.chapters.map((ch, idx) => (
+                      <li key={idx} className={ch.done ? 'checked-item' : 'unchecked-item'} style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '2px' }}>
                         <span>{ch.done ? '✅' : '○'}</span>
                         <span className="chk-label">{ch.title}</span>
                       </li>
@@ -77,7 +113,7 @@ export default function ProgressChart() {
               <div className="ring-info mt-3 border-top pt-2 w-full text-center">
                 <div className="ring-quiz-avg">
                   <span>Quiz Average Score: </span>
-                  <strong style={{ color: s.quizAvg >= 75 ? '#2e7d32' : '#c62828' }}>{s.quizAvg}%</strong>
+                  <strong style={{ color: s.quizAvg >= 75 ? '#2e7d32' : s.quizAvg > 0 ? '#E6A817' : 'var(--wood-ink-muted)' }}>{s.quizAvg > 0 ? `${s.quizAvg}%` : 'no score'}</strong>
                 </div>
               </div>
             </div>
@@ -97,7 +133,7 @@ export default function ProgressChart() {
             <span className="bar-subject-label font-bold">{s.name}</span>
             <div className="bars-container">
               {s.sessions.map((val, i) => {
-                const height = (val / maxSessions) * 80;
+                const height = Math.min(80, (val / maxSessions) * 80);
                 return (
                   <div key={i} className="bar-col">
                     <div className="bar-tooltip">{val} hours</div>
@@ -107,7 +143,7 @@ export default function ProgressChart() {
                     {val < 4 && val >= 2 && <span className="nursery-flower-sprout" style={{ transform: `translateY(-${height}px)` }}>🌱</span>}
                     
                     <div className="bar-fill sketch-border-sm"
-                      style={{ height: `${height}px`, background: s.color }}>
+                       style={{ height: `${height}px`, background: s.color }}>
                     </div>
                     <span className="bar-day-label">{weekLabels[i]}</span>
                   </div>

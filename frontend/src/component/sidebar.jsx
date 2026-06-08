@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Sidebar({ sidebarOpen, setSidebarOpen, active, setActive, navItems }) {
+export default function Sidebar({ sidebarOpen, setSidebarOpen, active, setActive, navItems, onLogout }) {
   return (
     <aside className={`dashboard-sidebar sketch-border ${sidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'}`}>
       {/* Brand strip */}
@@ -42,7 +42,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, active, setActive
       {/* Logout at bottom */}
       <div className="sidebar-footer">
         <button className="sidebar-logout-btn sketch-border-sm"
-          onClick={() => { window.location.hash = ''; }}>
+          onClick={onLogout || (() => { window.location.hash = '#login'; })}>
           <span>🚪</span>
           {sidebarOpen && <span>Leave Cabin</span>}
         </button>
