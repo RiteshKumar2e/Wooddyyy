@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Subject = require('../models/Subject');
 const Topic = require('../models/Topic');
 const Quiz = require('../models/Quiz');
+const asyncHandler = require('../utils/asyncHandler');
 
 // Build a { subjectId: { total, done } } map of topic counts for a user.
 const topicCountsBySubject = async (userId) => {
@@ -35,112 +36,86 @@ const withProgress = (subject, counts) => {
 
 // @route   GET /api/subjects
 // @access  Private
-const getSubjects = async (req, res, next) => {
-  try {
-    const [subjects, counts] = await Promise.all([
-      Subject.find({ user: req.user._id }).sort('-createdAt').lean(),
-      topicCountsBySubject(req.user._id),
-    ]);
+const getSubjects = asyncHandler(async (req, res) => {
+  const [subjects, counts] = await Promise.all([
+    Subject.find({ user: req.user._id }).sort('-createdAt').lean(),
+    topicCountsBySubject(req.user._id),
+  ]);
 
-    return res.json(subjects.map((s) => withProgress(s, counts)));
-  } catch (error) {
-    return next(error);
-  }
-};
+  return res.json(subjects.map((s) => withProgress(s, counts)));
+});
 
 // @route   GET /api/subjects/:id
 // @access  Private  (subject + its topics/chapters)
-const getSubject = async (req, res, next) => {
-  try {
-    const subject = await Subject.findOne({ _id: req.params.id, user: req.user._id }).lean();
-    if (!subject) {
-      return res.status(404).json({ message: 'Subject not found' });
-    }
-
-    const chapters = await Topic.find({ subject: subject._id, user: req.user._id })
-      .sort('createdAt')
-      .lean();
-
-    const done = chapters.filter((c) => c.done).length;
-    const progress = chapters.length ? Math.round((done / chapters.length) * 100) : 0;
-
-    return res.json({
-      ...subject,
-      chapters,
-      totalChapters: chapters.length,
-      completedChapters: done,
-      progress,
-    });
-  } catch (error) {
-    return next(error);
+const getSubject = asyncHandler(async (req, res) => {
+  const subject = await Subject.findOne({ _id: req.params.id, user: req.user._id }).lean();
+  if (!subject) {
+    return res.status(404).json({ message: 'Subject not found' });
   }
-};
+
+  const chapters = await Topic.find({ subject: subject._id, user: req.user._id })
+    .sort('createdAt')
+    .lean();
+
+  const done = chapters.filter((c) => c.done).length;
+  const progress = chapters.length ? Math.round((done / chapters.length) * 100) : 0;
+
+  return res.json({
+    ...subject,
+    chapters,
+    totalChapters: chapters.length,
+    completedChapters: done,
+    progress,
+  });
+});
 
 // @route   POST /api/subjects
 // @access  Private
-const createSubject = async (req, res, next) => {
-  try {
-    const { name, color, weeklySessions } = req.body;
-    if (!name || !name.trim()) {
-      return res.status(400).json({ message: 'Subject name is required' });
-    }
-
-    const subject = await Subject.create({
-      user: req.user._id,
-      name: name.trim(),
-      color,
-      weeklySessions,
-    });
-
-    return res.status(201).json(withProgress(subject.toObject(), {}));
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({ message: 'You already have a subject with that name' });
-    }
-    return next(error);
+const createSubject = asyncHandler(async (req, res) => {
+  const { name, color, weeklySessions } = req.body;
+  if (!name || !name.trim()) {
+    return res.status(400).json({ message: 'Subject name is required' });
   }
-};
+
+  const subject = await Subject.create({
+    user: req.user._id,
+    name: name.trim(),
+    color,
+    weeklySessions,
+  });
+
+  return res.status(201).json(withProgress(subject.toObject(), {}));
+});
 
 // @route   PUT /api/subjects/:id
 // @access  Private
-const updateSubject = async (req, res, next) => {
-  try {
-    const { name, color, weeklySessions } = req.body;
-    const subject = await Subject.findOne({ _id: req.params.id, user: req.user._id });
-    if (!subject) {
-      return res.status(404).json({ message: 'Subject not found' });
-    }
-
-    if (name !== undefined) subject.name = name;
-    if (color !== undefined) subject.color = color;
-    if (weeklySessions !== undefined) subject.weeklySessions = weeklySessions;
-
-    await subject.save();
-    return res.json(subject);
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({ message: 'You already have a subject with that name' });
-    }
-    return next(error);
+const updateSubject = asyncHandler(async (req, res) => {
+  const { name, color, weeklySessions } = req.body;
+  const subject = await Subject.findOne({ _id: req.params.id, user: req.user._id });
+  if (!subject) {
+    return res.status(404).json({ message: 'Subject not found' });
   }
-};
+
+  if (name !== undefined) subject.name = name;
+  if (color !== undefined) subject.color = color;
+  if (weeklySessions !== undefined) subject.weeklySessions = weeklySessions;
+
+  await subject.save();
+  return res.json(subject);
+});
 
 // @route   DELETE /api/subjects/:id
 // @access  Private  (also removes the subject's topics)
-const deleteSubject = async (req, res, next) => {
-  try {
-    const subject = await Subject.findOneAndDelete({ _id: req.params.id, user: req.user._id });
-    if (!subject) {
-      return res.status(404).json({ message: 'Subject not found' });
-    }
-
-    await Topic.deleteMany({ subject: subject._id, user: req.user._id });
-
-    return res.json({ message: 'Subject and its topics removed', id: subject._id });
-  } catch (error) {
-    return next(error);
+const deleteSubject = asyncHandler(async (req, res) => {
+  const subject = await Subject.findOneAndDelete({ _id: req.params.id, user: req.user._id });
+  if (!subject) {
+    return res.status(404).json({ message: 'Subject not found' });
   }
-};
+
+  await Topic.deleteMany({ subject: subject._id, user: req.user._id });
+
+  return res.json({ message: 'Subject and its topics removed', id: subject._id });
+});
 
 module.exports = {
   getSubjects,
