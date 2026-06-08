@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-
-const initialSubjects = [];
+import React, { useState, useEffect } from 'react';
+import { api } from '../../api';
 
 export default function StudyPlan() {
-  const [subjects, setSubjects] = useState(initialSubjects);
+  const [subjects, setSubjects] = useState([]);
   const [activeSubject, setActiveSubject] = useState(null);
   const [newChapterTitle, setNewChapterTitle] = useState('');
   
@@ -12,6 +11,10 @@ export default function StudyPlan() {
   const [newChapterTime, setNewChapterTime] = useState('');
   const [newChapterNotes, setNewChapterNotes] = useState('');
 
+  // New subject inputs
+  const [newSubjectName, setNewSubjectName] = useState('');
+  const [newSubjectColor, setNewSubjectColor] = useState('#E6A817');
+
   // Syllabus upload states
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -19,41 +22,141 @@ export default function StudyPlan() {
 
   const active = subjects.find(s => s.id === activeSubject);
 
-  const toggleChapter = (chapId) => {
-    setSubjects(subjects.map(s => {
-      if (s.id === activeSubject) {
-        const updatedChapters = s.chapters.map(c => c.id === chapId ? { ...c, done: !c.done } : c);
-        const doneCount = updatedChapters.filter(c => c.done).length;
-        const totalCount = updatedChapters.length;
-        const newProgress = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
-        return { ...s, chapters: updatedChapters, progress: newProgress };
+  // Fetch subjects on mount
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const data = await api.get('/api/subjects');
+        const mapped = data.map(s => ({
+          id: s._id,
+          name: s.name,
+          color: s.color,
+          progress: s.progress,
+          chapters: [] // will load on click
+        }));
+        setSubjects(mapped);
+        if (mapped.length > 0) {
+          setActiveSubject(mapped[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to load study plan subjects:', err);
       }
-      return s;
-    }));
+    };
+    fetchSubjects();
+  }, []);
+
+  // Fetch chapters when activeSubject changes
+  useEffect(() => {
+    if (!activeSubject) return;
+    const fetchChapters = async () => {
+      try {
+        const data = await api.get(`/api/subjects/${activeSubject}`);
+        setSubjects(prev => prev.map(s => {
+          if (s.id === activeSubject) {
+            return {
+              ...s,
+              progress: data.progress,
+              chapters: (data.chapters || []).map(c => ({
+                id: c._id,
+                title: c.title,
+                done: c.done,
+                notes: c.notes || '',
+                date: c.date || '',
+                time: c.time || ''
+              }))
+            };
+          }
+           return s;
+        }));
+      } catch (err) {
+        console.error('Failed to load subject chapters:', err);
+      }
+    };
+    fetchChapters();
+  }, [activeSubject]);
+
+  const handleAddSubject = async (e) => {
+    e.preventDefault();
+    if (!newSubjectName.trim()) return;
+    try {
+      const created = await api.post('/api/subjects', { name: newSubjectName, color: newSubjectColor });
+      const mapped = {
+        id: created._id,
+        name: created.name,
+        color: created.color,
+        progress: 0,
+        chapters: []
+      };
+      setSubjects(prev => [...prev, mapped]);
+      setNewSubjectName('');
+      setActiveSubject(mapped.id);
+    } catch (err) {
+      console.error('Failed to create new subject:', err);
+    }
   };
 
-  const addChapter = (e) => {
+  const toggleChapter = async (chapId) => {
+    const subjectObj = subjects.find(s => s.id === activeSubject);
+    if (!subjectObj) return;
+    const chapter = subjectObj.chapters.find(c => c.id === chapId);
+    if (!chapter) return;
+
+    try {
+      const updated = await api.patch(`/api/topics/${chapId}/toggle`);
+      setSubjects(prev => prev.map(s => {
+        if (s.id === activeSubject) {
+          const updatedChapters = s.chapters.map(c => c.id === chapId ? { ...c, done: updated.done } : c);
+          const doneCount = updatedChapters.filter(c => c.done).length;
+          const totalCount = updatedChapters.length;
+          const newProgress = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+          return { ...s, chapters: updatedChapters, progress: newProgress };
+        }
+        return s;
+      }));
+    } catch (err) {
+      console.error('Failed to toggle chapter status:', err);
+    }
+  };
+
+  const addChapter = async (e) => {
     e.preventDefault();
-    if (!newChapterTitle.trim()) return;
-    setSubjects(subjects.map(s => {
-      if (s.id === activeSubject) {
-        const newChapter = {
-          id: Date.now(),
-          title: newChapterTitle,
-          done: false,
-          notes: newChapterNotes,
-          date: newChapterDate,
-          time: newChapterTime
-        };
-        const updatedChapters = [...s.chapters, newChapter];
-        const doneCount = updatedChapters.filter(c => c.done).length;
-        const newProgress = Math.round((doneCount / updatedChapters.length) * 100);
-        return { ...s, chapters: updatedChapters, progress: newProgress };
-      }
-      return s;
-    }));
-    setNewChapterTitle('');
-    setNewChapterNotes('');
+    if (!newChapterTitle.trim() || !activeSubject) return;
+
+    try {
+      const created = await api.post('/api/topics', {
+        subject: activeSubject,
+        title: newChapterTitle,
+        notes: newChapterNotes,
+        date: newChapterDate,
+        time: newChapterTime,
+        estimatedHours: 1
+      });
+
+      setSubjects(prev => prev.map(s => {
+        if (s.id === activeSubject) {
+          const newChapter = {
+            id: created._id,
+            title: created.title,
+            done: created.done,
+            notes: created.notes || '',
+            date: created.date || '',
+            time: created.time || ''
+          };
+          const updatedChapters = [...s.chapters, newChapter];
+          const doneCount = updatedChapters.filter(c => c.done).length;
+          const newProgress = Math.round((doneCount / updatedChapters.length) * 100);
+          return { ...s, chapters: updatedChapters, progress: newProgress };
+        }
+        return s;
+      }));
+
+      setNewChapterTitle('');
+      setNewChapterNotes('');
+      setNewChapterDate('');
+      setNewChapterTime('');
+    } catch (err) {
+      console.error('Failed to save study chapter:', err);
+    }
   };
 
   // Mock upload parser
@@ -112,7 +215,7 @@ export default function StudyPlan() {
       </div>
 
       <div className="sp-layout">
-        {/* Subject Tabs */}
+        {/* Subject Tabs & Subject Addition Form */}
         <div className="sp-subject-sidebar">
           {subjects.length === 0 ? (
             <div className="sp-empty sketch-border-sm">No subjects added yet.</div>
@@ -127,16 +230,41 @@ export default function StudyPlan() {
               <span className="subject-pct">{s.progress}%</span>
             </button>
           ))}
+
+          {/* Add Subject form inside the sidebar */}
+          <form onSubmit={handleAddSubject} className="add-subject-form sketch-border-sm" style={{ marginTop: '15px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: 'var(--wood-card)' }}>
+            <h4 className="font-bold text-xs" style={{ borderBottom: '1.5px dashed var(--wood-ink)', paddingBottom: '4px', marginBottom: '4px' }}>🌿 Add Subject</h4>
+            <input 
+              value={newSubjectName} 
+              onChange={e => setNewSubjectName(e.target.value)} 
+              placeholder="e.g. Physics" 
+              className="form-input sketch-border-sm" 
+              style={{ fontSize: '13px', minHeight: '34px', padding: '4px 8px' }}
+              required 
+            />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+              <input 
+                type="color" 
+                value={newSubjectColor} 
+                onChange={e => setNewSubjectColor(e.target.value)} 
+                style={{ border: 'none', background: 'none', width: '32px', height: '32px', padding: 0, cursor: 'pointer' }}
+                title="Choose Theme Color"
+              />
+              <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow" style={{ flex: 1, padding: '4px 8px', fontSize: '12px', minHeight: '32px' }}>
+                + Add
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* Chapter List */}
         <div className="sp-chapter-col sketch-border sketch-shadow">
-          <div className="sp-chapter-header" style={{ borderBottom: `3px solid ${active?.color}` }}>
+          <div className="sp-chapter-header" style={{ borderBottom: `3px solid ${active?.color || 'var(--wood-accent)'}` }}>
             <h3 className="font-bold text-xl">{active?.name ? `${active.name} — Scheduled Branches` : 'Scheduled Branches'}</h3>
             <div className="sp-overall-bar sketch-border-sm">
-              <div className="sp-overall-fill" style={{ width: `${active?.progress}%`, background: active?.color }}></div>
+              <div className="sp-overall-fill" style={{ width: `${active?.progress || 0}%`, background: active?.color || 'var(--wood-accent)' }}></div>
             </div>
-            <p className="text-xs text-gray-500">{active ? `${active.progress}% of study branches harvested` : 'No branches yet.'}</p>
+            <p className="text-xs text-gray-500">{active ? `${active.progress}% of study branches harvested` : 'No active subject selected.'}</p>
           </div>
 
           <ul className="chapter-list">
@@ -149,46 +277,48 @@ export default function StudyPlan() {
                   <div className="chapter-title-row">
                     <p className="chapter-title">{ch.title}</p>
                     <div className="chapter-meta">
-                      <span className="meta-badge date-badge">📅 {ch.date}</span>
-                      <span className="meta-badge time-badge">⏰ {ch.time}</span>
+                      {ch.date && <span className="meta-badge date-badge">📅 {ch.date}</span>}
+                      {ch.time && <span className="meta-badge time-badge">⏰ {ch.time}</span>}
                     </div>
                   </div>
                   {ch.notes && <p className="chapter-note handwritten">✏️ {ch.notes}</p>}
                 </div>
                 <span className="chapter-status">{ch.done ? '✅' : '○'}</span>
               </li>
-            )) : <li className="chapter-empty sketch-border-sm">Add a subject to start planning chapters.</li>}
+            )) : <li className="chapter-empty sketch-border-sm">Select or add a subject, then add study branches below.</li>}
           </ul>
 
           {/* Add Chapter Form */}
-          <form onSubmit={addChapter} className="add-chapter-form-expanded sketch-border-sm">
-            <h4 className="font-bold text-sm mb-3">Carve Custom Branch Manually</h4>
-            <div className="manual-form-grid">
-              <div className="form-group-sm">
-                <label className="text-xxs font-bold">Branch Title *</label>
-                <input value={newChapterTitle} onChange={e => setNewChapterTitle(e.target.value)}
-                  placeholder="Enter a branch title" className="form-input sketch-border-sm" required />
+          {active && (
+            <form onSubmit={addChapter} className="add-chapter-form-expanded sketch-border-sm">
+              <h4 className="font-bold text-sm mb-3">Carve Custom Branch Manually</h4>
+              <div className="manual-form-grid">
+                <div className="form-group-sm">
+                  <label className="text-xxs font-bold">Branch Title *</label>
+                  <input value={newChapterTitle} onChange={e => setNewChapterTitle(e.target.value)}
+                    placeholder="Enter a branch title" className="form-input sketch-border-sm" required />
+                </div>
+                <div className="form-group-sm">
+                  <label className="text-xxs font-bold">Target Date</label>
+                  <input type="date" value={newChapterDate} onChange={e => setNewChapterDate(e.target.value)}
+                    className="form-input sketch-border-sm" />
+                </div>
+                <div className="form-group-sm">
+                  <label className="text-xxs font-bold">Study Time slot</label>
+                  <input value={newChapterTime} onChange={e => setNewChapterTime(e.target.value)}
+                    placeholder="e.g. 10:00 AM" className="form-input sketch-border-sm" />
+                </div>
+                <div className="form-group-sm full-width">
+                  <label className="text-xxs font-bold">Quick Memo</label>
+                  <input value={newChapterNotes} onChange={e => setNewChapterNotes(e.target.value)}
+                    placeholder="Add a short note or reminder" className="form-input sketch-border-sm" />
+                </div>
               </div>
-              <div className="form-group-sm">
-                <label className="text-xxs font-bold">Target Date</label>
-                <input type="date" value={newChapterDate} onChange={e => setNewChapterDate(e.target.value)}
-                  className="form-input sketch-border-sm" />
-              </div>
-              <div className="form-group-sm">
-                <label className="text-xxs font-bold">Study Time slot</label>
-                <input value={newChapterTime} onChange={e => setNewChapterTime(e.target.value)}
-                  placeholder="Add a study window" className="form-input sketch-border-sm" />
-              </div>
-              <div className="form-group-sm full-width">
-                <label className="text-xxs font-bold">Quick Memo</label>
-                <input value={newChapterNotes} onChange={e => setNewChapterNotes(e.target.value)}
-                  placeholder="Add a short note or reminder" className="form-input sketch-border-sm" />
-              </div>
-            </div>
-            <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow mt-3 w-full justify-center study-plan-submit-btn">
-              + Plant Study Branch
-            </button>
-          </form>
+              <button type="submit" className="btn-sketch btn-sketch-primary sketch-border-sm sketch-shadow mt-3 w-full justify-center study-plan-submit-btn">
+                + Plant Study Branch
+              </button>
+            </form>
+          )}
         </div>
       </div>
 

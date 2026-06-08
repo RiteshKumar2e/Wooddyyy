@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { api } from '../api';
 import '../styles/register.css';
 
-export default function RegisterPage() {
+export default function RegisterPage({ onRegisterSuccess }) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -11,20 +12,32 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [error, setError] = useState('');
   
   // Custom mismatch flag
   const passwordsMatch = password && confirmPassword ? password === confirmPassword : true;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!fullName || !email || !phone || !password || !confirmPassword) return;
     if (password !== confirmPassword) return;
 
+    setError('');
     setFormSubmitted(true);
-    setTimeout(() => {
-      // Mock navigation to dashboard
+    try {
+      const data = await api.post('/api/auth/register', {
+        fullName,
+        email,
+        phone,
+        password
+      });
+      localStorage.setItem('woody-token', data.token);
+      if (onRegisterSuccess) await onRegisterSuccess();
       window.location.hash = '#student-dashboard';
-    }, 1800);
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+      setFormSubmitted(false);
+    }
   };
 
   return (
@@ -53,6 +66,12 @@ export default function RegisterPage() {
           <h2 className="register-title">Craft Your Workspace</h2>
           <p className="register-subtitle">Set up your digital learning desk and begin your focus journey.</p>
         </div>
+
+        {error && (
+          <div className="error-message sketch-border-sm" style={{ backgroundColor: '#FFEDEB', color: '#C62828', padding: '10px 14px', fontSize: '13px', marginBottom: '16px', border: '2px solid #C62828', borderRadius: '4px', textAlign: 'center', fontFamily: 'var(--sans)', fontWeight: 'bold' }}>
+            ⚠️ {error}
+          </div>
+        )}
 
         {formSubmitted ? (
           <div className="mock-success-screen text-center">

@@ -1,29 +1,55 @@
 import React, { useState } from 'react';
+import { api } from '../api';
 import '../styles/login-page.css';
 
-export default function LoginPage() {
+export default function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) return;
+    setError('');
     setFormSubmitted(true);
-    setTimeout(() => {
-      // Mock login navigation
+    try {
+      const data = await api.post('/api/auth/login', { email, password });
+      localStorage.setItem('woody-token', data.token);
+      if (onLoginSuccess) await onLoginSuccess();
       window.location.hash = '#student-dashboard';
-    }, 1500);
+    } catch (err) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+      setFormSubmitted(false);
+    }
   };
 
-  const handleDemoLogin = () => {
-    setEmail('guest@woody.com');
-    setPassword('cozyfocus123');
+  const handleDemoLogin = async () => {
+    setError('');
     setFormSubmitted(true);
-    setTimeout(() => {
+    try {
+      const data = await api.post('/api/auth/login', { email: 'guest@woody.com', password: 'cozyfocus123' });
+      localStorage.setItem('woody-token', data.token);
+      if (onLoginSuccess) await onLoginSuccess();
       window.location.hash = '#student-dashboard';
-    }, 1500);
+    } catch (err) {
+      // If guest doesn't exist, register them automatically
+      try {
+        const data = await api.post('/api/auth/register', {
+          fullName: 'Guest Woody',
+          email: 'guest@woody.com',
+          phone: '9876543210',
+          password: 'cozyfocus123'
+        });
+        localStorage.setItem('woody-token', data.token);
+        if (onLoginSuccess) await onLoginSuccess();
+        window.location.hash = '#student-dashboard';
+      } catch (regErr) {
+        setError(regErr.message || 'Demo desk setup failed.');
+        setFormSubmitted(false);
+      }
+    }
   };
 
   return (
@@ -53,6 +79,12 @@ export default function LoginPage() {
           <h2 className="login-title">Enter Your Cabin</h2>
           <p className="login-subtitle">Pull up a chair, brew some tea, and settle into focus.</p>
         </div>
+
+        {error && (
+          <div className="error-message sketch-border-sm" style={{ backgroundColor: '#FFEDEB', color: '#C62828', padding: '10px 14px', fontSize: '13px', marginBottom: '16px', border: '2px solid #C62828', borderRadius: '4px', textAlign: 'center', fontFamily: 'var(--sans)', fontWeight: 'bold' }}>
+            ⚠️ {error}
+          </div>
+        )}
 
         {formSubmitted ? (
           <div className="mock-login-success text-center">
